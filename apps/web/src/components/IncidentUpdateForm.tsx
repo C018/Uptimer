@@ -67,7 +67,7 @@ export function IncidentUpdateForm({
       {normalized && (
         <div>
           <div className={labelClass}>{t('common.preview')}</div>
-          <div className="border border-slate-200 dark:border-slate-600 rounded-lg p-4 bg-slate-50 dark:bg-slate-700/50">
+          <div className="border ui-border-hairline dark:border-[var(--color-border)] rounded-lg p-4 bg-[var(--color-bg)] dark:bg-[var(--color-bg-secondary)]">
             <Markdown text={normalized} />
           </div>
         </div>

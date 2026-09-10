@@ -55,10 +55,10 @@ export function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center p-4 sm:p-6">
+    <div className="min-h-screen bg-[var(--color-bg)] dark:bg-[var(--color-bg-secondary)] flex items-center justify-center p-4 sm:p-6">
       <Card className="w-full max-w-md p-7 sm:p-8">
         <div className="mb-7 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-bg-secondary)] text-white dark:bg-[var(--color-bg)] dark:text-[var(--color-text-primary)]">
             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
                 strokeLinecap="round"
@@ -68,10 +68,10 @@ export function AdminLogin() {
               />
             </svg>
           </div>
-          <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+          <h1 className="text-xl font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
             {t('admin_login.title')}
           </h1>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+          <p className="mt-1 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
             {t('admin_login.subtitle')}
           </p>
         </div>
@@ -80,7 +80,7 @@ export function AdminLogin() {
           <div>
             <label
               htmlFor="token"
-              className="ui-label text-sm font-medium text-slate-700 dark:text-slate-300"
+              className="ui-label text-sm font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-primary)]"
             >
               {t('admin_login.token')}
             </label>
@@ -105,7 +105,7 @@ export function AdminLogin() {
         <div className="mt-6 text-center">
           <Link
             to="/"
-            className="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
+            className="text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-primary)] transition-colors"
           >
             {t('admin_login.back_to_status')}
           </Link>

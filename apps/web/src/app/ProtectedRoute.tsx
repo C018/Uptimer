@@ -29,7 +29,7 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
   }, [ensureValidToken]);
 
   if (!checked) {
-    return <div className="min-h-screen bg-slate-50 dark:bg-slate-900" />;
+    return <div className="min-h-screen bg-[var(--color-bg)] dark:bg-[var(--color-bg-secondary)]" />;
   }
 
   if (!isAuthenticated || !valid) {

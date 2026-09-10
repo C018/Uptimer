@@ -1,11 +1,13 @@
 import pLimit from 'p-limit';
 
 import type {
+  BarkChannelConfig,
   CustomWebhookChannelConfig,
   TelegramChannelConfig,
   WebhookChannelConfig,
 } from '@uptimer/db';
 
+import { dispatchBarkPresetRequest } from './bark';
 import { claimNotificationDelivery, finalizeNotificationDelivery } from './dedupe';
 import { decryptTelegramBotToken } from './telegram-token';
 import { defaultMessageForEvent, renderJsonTemplate, renderStringTemplate } from './template';
@@ -67,6 +69,10 @@ function readAdminToken(env: Record<string, unknown>): string | null {
 
 function isTelegramChannelConfig(config: WebhookChannelConfig): config is TelegramChannelConfig {
   return config.preset === 'telegram';
+}
+
+function isBarkChannelConfig(config: WebhookChannelConfig): config is BarkChannelConfig {
+  return config.preset === 'bark';
 }
 
 function shouldSendEvent(config: WebhookChannelConfig, eventType: string): boolean {
@@ -463,7 +469,17 @@ export async function dispatchWebhookToChannel(args: {
 
   let outcome: WebhookDispatchResult;
   try {
-    outcome = isTelegramChannelConfig(config)
+    if (isBarkChannelConfig(config)) {
+      outcome = await dispatchBarkPresetRequest({
+        env: args.env,
+        channel: { ...args.channel, config },
+        eventType: args.eventType,
+        eventKey: args.eventKey,
+        payload: args.payload,
+        now,
+      });
+    } else {
+      outcome = isTelegramChannelConfig(config)
       ? await dispatchTelegramPresetRequest({
           env: args.env,
           channel: { ...args.channel, config },
@@ -480,6 +496,7 @@ export async function dispatchWebhookToChannel(args: {
           payload: args.payload,
           now,
         });
+    }
   } catch (err) {
     outcome = { status: 'failed', httpStatus: null, error: toErrorMessage(err) };
   }

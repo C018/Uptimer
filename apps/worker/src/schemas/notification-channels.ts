@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { customWebhookChannelConfigSchema } from '@uptimer/db';
+import { barkChannelConfigSchema, customWebhookChannelConfigSchema } from '@uptimer/db';
 
 const workerSecretRefSchema = z
   .string()
@@ -22,6 +22,7 @@ const notificationMessageTemplateSchema = z.string().min(1).max(10_000).optional
 const notificationEventTypeSchema = z.enum([
   'monitor.down',
   'monitor.up',
+  'monitor.ssl_expiring',
   'incident.created',
   'incident.updated',
   'incident.resolved',
@@ -81,10 +82,65 @@ export const telegramChannelPatchInputSchema = telegramChannelBaseInputSchema.su
 export type TelegramChannelCreateInput = z.infer<typeof telegramChannelCreateInputSchema>;
 export type TelegramChannelPatchInput = z.infer<typeof telegramChannelPatchInputSchema>;
 
+/**
+ * Bark input mirrors the stored schema, except the device key arrives as
+ * plaintext (`device_key`) and is encrypted before it is written to D1.
+ */
+const barkChannelBaseInputSchema = z.object({
+  preset: z.literal('bark'),
+  device_key: z.string().trim().min(1).max(512).optional(),
+  device_key_secret_ref: workerSecretRefSchema.optional(),
+  server_url: barkChannelConfigSchema.shape.server_url,
+  level: barkChannelConfigSchema.shape.level,
+  sound: barkChannelConfigSchema.shape.sound,
+  group: barkChannelConfigSchema.shape.group,
+  icon: barkChannelConfigSchema.shape.icon,
+  badge: barkChannelConfigSchema.shape.badge,
+  is_archive: barkChannelConfigSchema.shape.is_archive,
+  url: barkChannelConfigSchema.shape.url,
+  copy: barkChannelConfigSchema.shape.copy,
+  timeout_ms: notificationChannelTimeoutMsSchema,
+  message_template: notificationMessageTemplateSchema,
+  enabled_events: z.array(notificationEventTypeSchema).min(1).optional(),
+});
+
+export const barkChannelCreateInputSchema = barkChannelBaseInputSchema.superRefine((val, ctx) => {
+  const hasDirectKey = hasText(val.device_key);
+  const hasSecretRef = hasText(val.device_key_secret_ref);
+
+  if (hasDirectKey === hasSecretRef) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['device_key'],
+      message: 'provide exactly one of device_key or device_key_secret_ref',
+    });
+  }
+});
+
+export const barkChannelPatchInputSchema = barkChannelBaseInputSchema.superRefine((val, ctx) => {
+  const hasDirectKey = hasText(val.device_key);
+  const hasSecretRef = hasText(val.device_key_secret_ref);
+
+  if (hasDirectKey && hasSecretRef) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['device_key'],
+      message: 'provide only one of device_key or device_key_secret_ref',
+    });
+  }
+});
+
+export type BarkChannelCreateInput = z.infer<typeof barkChannelCreateInputSchema>;
+export type BarkChannelPatchInput = z.infer<typeof barkChannelPatchInputSchema>;
+
 export const createNotificationChannelInputSchema = z.object({
   name: z.string().min(1),
   type: z.literal('webhook').default('webhook'),
-  config_json: z.union([customWebhookChannelConfigSchema, telegramChannelCreateInputSchema]),
+  config_json: z.union([
+    customWebhookChannelConfigSchema,
+    telegramChannelCreateInputSchema,
+    barkChannelCreateInputSchema,
+  ]),
   is_active: z.boolean().optional(),
 });
 
@@ -94,7 +150,11 @@ export const patchNotificationChannelInputSchema = z
   .object({
     name: z.string().min(1).optional(),
     config_json: z
-      .union([customWebhookChannelConfigSchema, telegramChannelPatchInputSchema])
+      .union([
+        customWebhookChannelConfigSchema,
+        telegramChannelPatchInputSchema,
+        barkChannelPatchInputSchema,
+      ])
       .optional(),
     is_active: z.boolean().optional(),
   })

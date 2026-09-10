@@ -42,7 +42,7 @@ export function ResolveIncidentForm({
       {normalized && (
         <div>
           <div className={labelClass}>{t('common.preview')}</div>
-          <div className="border border-slate-200 dark:border-slate-600 rounded-lg p-4 bg-slate-50 dark:bg-slate-700/50">
+          <div className="border ui-border-hairline dark:border-[var(--color-border)] rounded-lg p-4 bg-[var(--color-bg)] dark:bg-[var(--color-bg-secondary)]">
             <Markdown text={normalized} />
           </div>
         </div>
@@ -55,7 +55,7 @@ export function ResolveIncidentForm({
         <Button
           type="submit"
           disabled={isLoading}
-          className="flex-1 !bg-emerald-600 hover:!bg-emerald-700"
+          className="flex-1 !bg-[var(--color-up)] text-white hover:!brightness-[1.06]"
         >
           {isLoading ? t('resolve_incident.resolving') : t('resolve_incident.resolve')}
         </Button>

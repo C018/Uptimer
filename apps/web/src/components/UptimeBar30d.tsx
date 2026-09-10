@@ -3,6 +3,8 @@ import { createPortal } from 'react-dom';
 
 import type { HomepageUptimeDayStrip, UptimeDayPreview, UptimeRatingLevel } from '../api/types';
 import { useI18n } from '../app/I18nContext';
+import { useTheme } from '../app/ThemeContext';
+import { chartPalette, unknownFill, type AppleChartPalette } from '../theme/applePalette';
 import { formatDate } from '../utils/datetime';
 import { getUptimeBgClasses, getUptimeTier } from '../utils/uptime';
 
@@ -63,30 +65,35 @@ function formatSec(totalSeconds: number): string {
 }
 
 function tooltipDotClass(uptimePct: number | null, level: UptimeRatingLevel): string {
-  if (uptimePct === null) return 'bg-slate-300 dark:bg-slate-600';
+  if (uptimePct === null) return 'bg-[var(--color-unknown)]';
   return getUptimeBgClasses(getUptimeTier(uptimePct, level));
 }
 
-function uptimeFill(uptimePct: number | null, level: UptimeRatingLevel): string {
-  if (uptimePct === null) return '#cbd5e1';
+function uptimeFill(
+  uptimePct: number | null,
+  level: UptimeRatingLevel,
+  palette: AppleChartPalette,
+  isDark: boolean,
+): string {
+  if (uptimePct === null) return unknownFill(isDark);
 
   const tier = getUptimeTier(uptimePct, level);
   switch (tier) {
     case 'emerald':
     case 'green':
-      return '#10b981';
+      return palette.tierBest;
     case 'lime':
-      return '#84cc16';
+      return palette.tierGood;
     case 'yellow':
     case 'amber':
     case 'orange':
-      return '#f59e0b';
+      return palette.tierFair;
     case 'red':
     case 'rose':
-      return '#ef4444';
+      return palette.tierPoor;
     case 'slate':
     default:
-      return '#cbd5e1';
+      return unknownFill(isDark);
   }
 }
 
@@ -118,6 +125,8 @@ function buildSvgDataUri(
   slots: DisplaySlot[],
   ratingLevel: UptimeRatingLevel,
   compact: boolean,
+  palette: AppleChartPalette,
+  isDark: boolean,
 ): string {
   const height = compact ? 20 : 24;
   const barWidth = compact ? 4 : 6;
@@ -127,7 +136,9 @@ function buildSvgDataUri(
   const rects = slots
     .map((slot, index) => {
       const x = index * (barWidth + gap);
-      const fill = slot.day ? uptimeFill(slot.day.uptime_pct, ratingLevel) : 'transparent';
+      const fill = slot.day
+        ? uptimeFill(slot.day.uptime_pct, ratingLevel, palette, isDark)
+        : 'transparent';
       return `<rect x="${x}" y="0" width="${barWidth}" height="${height}" rx="1" fill="${fill}"/>`;
     })
     .join('');
@@ -151,7 +162,7 @@ function Tooltip({
 
   return (
     <div
-      className="fixed z-50 px-3 py-2 text-xs bg-slate-900 dark:bg-slate-700 text-white rounded-lg shadow-lg pointer-events-none animate-fade-in"
+      className="fixed z-50 px-3 py-2 text-xs bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-secondary)] text-white rounded-lg shadow-lg pointer-events-none animate-fade-in"
       style={{
         left: position.x,
         top: position.y,
@@ -166,15 +177,15 @@ function Tooltip({
           {t('uptime.uptime')}
         </span>
       </div>
-      <div className="mt-1 text-slate-300">
+      <div className="mt-1 text-[var(--color-text-primary)]">
         {t('uptime.downtime')}: {formatSec(day.downtime_sec)}
       </div>
       {day.unknown_sec > 0 && (
-        <div className="text-slate-300">
+        <div className="text-[var(--color-text-primary)]">
           {t('uptime.unknown')}: {formatSec(day.unknown_sec)}
         </div>
       )}
-      <div className="absolute left-1/2 -bottom-1 -translate-x-1/2 w-2 h-2 bg-slate-900 dark:bg-slate-700 rotate-45" />
+      <div className="absolute left-1/2 -bottom-1 -translate-x-1/2 w-2 h-2 bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-secondary)] rotate-45" />
     </div>
   );
 }
@@ -190,6 +201,9 @@ export function UptimeBar30d({
   fillMode = 'pad',
 }: UptimeBar30dProps) {
   const { locale, t } = useI18n();
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
+  const palette = chartPalette(isDark);
   const [tooltip, setTooltip] = useState<{
     day: UptimeDayPreview;
     index: number;
@@ -232,8 +246,8 @@ export function UptimeBar30d({
   }, [displayBars, fillMode, maxBars]);
   const slotCount = slots.length;
   const backgroundImage = useMemo(
-    () => buildSvgDataUri(slots, ratingLevel, compact),
-    [compact, ratingLevel, slots],
+    () => buildSvgDataUri(slots, ratingLevel, compact, palette, isDark),
+    [compact, isDark, palette, ratingLevel, slots],
   );
   const showTooltip = (day: UptimeDayPreview, index: number, element: HTMLElement) => {
     const rect = element.getBoundingClientRect();
@@ -256,7 +270,7 @@ export function UptimeBar30d({
       >
         <div
           data-bar-chart
-          className="relative h-full w-full rounded-md bg-slate-200 dark:bg-slate-700"
+          className="relative h-full w-full rounded-md bg-[var(--color-bg)] dark:bg-[var(--color-bg-secondary)]"
           style={{
             backgroundImage,
             backgroundPosition: 'center',
@@ -297,7 +311,7 @@ export function UptimeBar30d({
         )}
         {tooltip && (
           <div
-            className="pointer-events-none absolute inset-y-0 rounded-sm ring-1 ring-white/70 shadow-[0_0_0_1px_rgba(15,23,42,0.08)]"
+            className="pointer-events-none absolute inset-y-0 rounded-sm ring-1 ring-[var(--color-card)] shadow-[0_0_0_1px_rgba(15,23,42,0.08)]"
             style={{
               left: `${(tooltip.index / slotCount) * 100}%`,
               width: `${100 / slotCount}%`,

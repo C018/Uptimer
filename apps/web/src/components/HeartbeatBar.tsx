@@ -3,6 +3,8 @@ import { createPortal } from 'react-dom';
 
 import type { CheckStatus, Heartbeat, HomepageHeartbeatStrip } from '../api/types';
 import { useI18n } from '../app/I18nContext';
+import { useTheme } from '../app/ThemeContext';
+import { chartPalette, unknownFill, type AppleChartPalette } from '../theme/applePalette';
 import { statusLabel } from '../i18n/labels';
 import { clampLatencyToCeiling, suggestLatencyAxisCeiling } from '../utils/latencyScale';
 
@@ -122,35 +124,41 @@ function getBarHeightPct(
   return minHeight + clamped * (100 - minHeight);
 }
 
-function heartbeatFill(status: CheckStatus): string {
+function heartbeatFill(status: CheckStatus, palette: AppleChartPalette, isDark: boolean): string {
   switch (status) {
     case 'up':
-      return '#10b981';
+      return palette.up;
     case 'down':
-      return '#ef4444';
+      return palette.down;
     case 'maintenance':
-      return '#3b82f6';
+      return palette.maintenance;
     case 'unknown':
     default:
-      return '#cbd5e1';
+      return unknownFill(isDark);
   }
 }
 
 function tooltipDotClass(status: CheckStatus): string {
   switch (status) {
     case 'up':
-      return 'bg-emerald-500 dark:bg-emerald-400';
+      return 'bg-[var(--color-up)] dark:bg-[var(--color-up)]';
     case 'down':
-      return 'bg-red-500 dark:bg-red-400';
+      return 'bg-[var(--color-down)] dark:bg-[var(--color-down)]';
     case 'maintenance':
-      return 'bg-blue-500 dark:bg-blue-400';
+      return 'bg-[var(--color-accent)] dark:bg-[var(--color-accent)]';
     case 'unknown':
     default:
-      return 'bg-slate-300 dark:bg-slate-600';
+      return 'bg-[var(--color-unknown)]';
   }
 }
 
-function buildSvgDataUri(slots: DisplaySlot[], compact: boolean, scale: LatencyScale | null): string {
+function buildSvgDataUri(
+  slots: DisplaySlot[],
+  compact: boolean,
+  scale: LatencyScale | null,
+  palette: AppleChartPalette,
+  isDark: boolean,
+): string {
   const height = compact ? 20 : 24;
   const barWidth = compact ? 4 : 6;
   const gap = compact ? 2 : 3;
@@ -167,7 +175,7 @@ function buildSvgDataUri(slots: DisplaySlot[], compact: boolean, scale: LatencyS
 
       const barHeight = (height * getBarHeightPct(slot.heartbeat, scale, compact)) / 100;
       const y = height - barHeight;
-      return `<rect x="${x}" y="${y.toFixed(2)}" width="${barWidth}" height="${barHeight.toFixed(2)}" rx="1" fill="${heartbeatFill(slot.heartbeat.status)}"/>`;
+      return `<rect x="${x}" y="${y.toFixed(2)}" width="${barWidth}" height="${barHeight.toFixed(2)}" rx="1" fill="${heartbeatFill(slot.heartbeat.status, palette, isDark)}"/>`;
     })
     .join('');
 
@@ -248,7 +256,7 @@ function Tooltip({
 
   return (
     <div
-      className="fixed z-50 px-3 py-2 text-xs bg-slate-900 dark:bg-slate-700 text-white rounded-lg shadow-lg pointer-events-none animate-fade-in"
+      className="fixed z-50 px-3 py-2 text-xs bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-secondary)] text-white rounded-lg shadow-lg pointer-events-none animate-fade-in"
       style={{
         left: position.x,
         top: position.y,
@@ -264,15 +272,15 @@ function Tooltip({
         <span className={`w-2 h-2 rounded-full ${tooltipDotClass(heartbeat.status)}`} />
         <span>{statusLabel(heartbeat.status, t)}</span>
         {heartbeat.latency_ms !== null && (
-          <span className="text-slate-400 dark:text-slate-300">• {heartbeat.latency_ms}ms</span>
+          <span className="text-[var(--color-text-muted)] dark:text-[var(--color-text-primary)]">• {heartbeat.latency_ms}ms</span>
         )}
       </div>
       {heartbeat.sample_count > 1 && (
-        <div className="mt-1 text-slate-300">
+        <div className="mt-1 text-[var(--color-text-primary)]">
           {t('heartbeat.sample_checks', { count: heartbeat.sample_count })}
         </div>
       )}
-      <div className="absolute left-1/2 -bottom-1 -translate-x-1/2 w-2 h-2 bg-slate-900 dark:bg-slate-700 rotate-45" />
+      <div className="absolute left-1/2 -bottom-1 -translate-x-1/2 w-2 h-2 bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-secondary)] rotate-45" />
     </div>
   );
 }
@@ -285,6 +293,9 @@ export function HeartbeatBar({
   density = 'default',
 }: HeartbeatBarProps) {
   const { t } = useI18n();
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
+  const palette = chartPalette(isDark);
   const [tooltip, setTooltip] = useState<{
     heartbeat: DisplayHeartbeat;
     index: number;
@@ -315,8 +326,8 @@ export function HeartbeatBar({
     [displayHeartbeats, slotCount],
   );
   const backgroundImage = useMemo(
-    () => buildSvgDataUri(slots, compact, latencyScale),
-    [compact, latencyScale, slots],
+    () => buildSvgDataUri(slots, compact, latencyScale, palette, isDark),
+    [compact, isDark, latencyScale, palette, slots],
   );
 
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -354,7 +365,7 @@ export function HeartbeatBar({
           aria-label={t('monitor_card.last_checks', {
             count: Math.min(sourceHeartbeats.length, slotCount),
           })}
-          className="relative h-full w-full rounded-md bg-slate-200 dark:bg-slate-700"
+          className="relative h-full w-full rounded-md bg-[var(--color-bg)] dark:bg-[var(--color-bg-secondary)]"
           style={{
             backgroundImage,
             backgroundPosition: 'center',
@@ -367,7 +378,7 @@ export function HeartbeatBar({
         {tooltip && (
           <div
             key={`heartbeat-overlay-${tooltip.index}-${tooltip.heartbeat.from_checked_at}-${tooltip.heartbeat.to_checked_at}`}
-            className="pointer-events-none absolute inset-y-0 rounded-sm ring-1 ring-white/70 shadow-[0_0_0_1px_rgba(15,23,42,0.08)]"
+            className="pointer-events-none absolute inset-y-0 rounded-sm ring-1 ring-[var(--color-card)] shadow-[0_0_0_1px_rgba(15,23,42,0.08)]"
             style={{
               left: `${(tooltip.index / slotCount) * 100}%`,
               width: `${100 / slotCount}%`,

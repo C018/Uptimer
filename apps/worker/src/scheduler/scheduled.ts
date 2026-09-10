@@ -1816,6 +1816,15 @@ export async function runScheduledTick(env: Env, ctx: ExecutionContext): Promise
     runScheduledShardedPublicSnapshotWork(env).catch((err) => {
       console.warn('scheduled sharded public snapshot work failed', err);
     });
+  // Certificate expiry is scanned from the Cron trigger (never from a probe
+  // request path) so a fully offline target can still raise certificate alerts.
+  ctx.waitUntil(
+    import('./ssl-scan')
+      .then(({ runSslScanPhase }) => runSslScanPhase({ env, ctx, now: currentNow() }))
+      .catch((err) => {
+        console.warn('scheduled: ssl scan phase failed', err);
+      }),
+  );
   const queueHomepageRefresh = (
     runtimeUpdates?: MonitorRuntimeUpdate[],
     runtimeSnapshotBaseline?: PublicMonitorRuntimeSnapshot,

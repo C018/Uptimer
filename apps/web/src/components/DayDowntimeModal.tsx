@@ -162,8 +162,8 @@ function buildContextIntervals(
 
 function contextTagClasses(kind: ContextInterval['kind']): string {
   return kind === 'maintenance'
-    ? 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300'
-    : 'bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-200';
+    ? 'ui-surface-accent ui-text-accent dark:ui-surface-accent dark:ui-text-accent'
+    : 'ui-surface-warn ui-text-warn dark:ui-surface-warn dark:ui-text-warn';
 }
 
 export function DayDowntimeModal({
@@ -223,13 +223,13 @@ export function DayDowntimeModal({
       >
         <div className="flex items-start justify-between gap-4 mb-4">
           <div>
-            <div className="text-xs uppercase tracking-wide text-slate-400 dark:text-slate-500 mb-1">
+            <div className="text-xs uppercase tracking-wide text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] mb-1">
               {t('day_downtime.title')}
             </div>
-            <h2 className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-slate-100">
+            <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
               {formatDay(dayStartAt, timeZone, locale)}
             </h2>
-            <div className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+            <div className="mt-1 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-primary)]">
               {t('common.total')}: {formatSec(totalDowntimeSec)}
             </div>
           </div>
@@ -239,7 +239,7 @@ export function DayDowntimeModal({
         </div>
 
         {intervals.length === 0 ? (
-          <div className="text-slate-500 dark:text-slate-400">{t('day_downtime.no_downtime')}</div>
+          <div className="text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">{t('day_downtime.no_downtime')}</div>
         ) : (
           <div className="space-y-3">
             {sortedEntries.map((entry, idx) => {
@@ -248,13 +248,13 @@ export function DayDowntimeModal({
                 return (
                   <div
                     key={`outside-${idx}`}
-                    className="flex items-center justify-between gap-4 p-3 rounded-lg bg-slate-50 dark:bg-slate-700/50"
+                    className="flex items-center justify-between gap-4 p-3 rounded-lg bg-[var(--color-bg)] dark:bg-[var(--color-bg-secondary)]"
                   >
-                    <div className="text-sm text-slate-700 dark:text-slate-200">
+                    <div className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-primary)]">
                       {formatClock(it.start, timeZone, locale)} –{' '}
                       {formatClock(it.end, timeZone, locale)}
                     </div>
-                    <div className="text-sm font-medium text-slate-900 dark:text-slate-100 tabular-nums">
+                    <div className="text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] tabular-nums">
                       {formatSec(it.end - it.start)}
                     </div>
                   </div>
@@ -268,20 +268,20 @@ export function DayDowntimeModal({
                   key={`group-${idx}`}
                   className={
                     isMaintenance
-                      ? 'p-3 rounded-lg border border-blue-200 dark:border-blue-500/30 bg-blue-50/40 dark:bg-blue-500/10'
-                      : 'p-3 rounded-lg border border-amber-200 dark:border-amber-500/30 bg-amber-50/40 dark:bg-amber-500/10'
+                      ? 'p-3 rounded-lg border ui-border-accent dark:ui-border-accent ui-surface-accent dark:ui-surface-accent'
+                      : 'p-3 rounded-lg border ui-border-warn dark:ui-border-warn ui-surface-warn dark:ui-surface-warn'
                   }
                 >
                   <div className="flex items-center justify-between gap-4 mb-2">
                     <div
-                      className={`text-sm font-medium ${isMaintenance ? 'text-blue-700 dark:text-blue-300' : 'text-amber-800 dark:text-amber-200'}`}
+                      className={`text-sm font-medium ${isMaintenance ? 'ui-text-accent dark:ui-text-accent' : 'ui-text-warn dark:ui-text-warn'}`}
                     >
                       {isMaintenance
                         ? t('day_downtime.kind_maintenance')
                         : t('day_downtime.kind_incident')}
                     </div>
                     <div
-                      className={`text-xs tabular-nums ${isMaintenance ? 'text-blue-700/80 dark:text-blue-300/80' : 'text-amber-800/80 dark:text-amber-200/80'}`}
+                      className={`text-xs tabular-nums ${isMaintenance ? 'ui-text-accent dark:ui-text-accent' : 'ui-text-warn dark:ui-text-warn'}`}
                     >
                       {formatClock(g.start, timeZone, locale)} –{' '}
                       {formatClock(g.end, timeZone, locale)}
@@ -300,13 +300,13 @@ export function DayDowntimeModal({
                     {g.downtime.map((it, didx) => (
                       <div
                         key={`d-${didx}`}
-                        className="flex items-center justify-between gap-4 p-3 rounded-lg bg-white/70 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700"
+                        className="flex items-center justify-between gap-4 p-3 rounded-lg bg-[var(--material-thick)] dark:bg-[var(--color-bg-secondary)] border ui-border-hairline dark:border-[var(--color-border)]"
                       >
-                        <div className="text-sm text-slate-700 dark:text-slate-200">
+                        <div className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-primary)]">
                           {formatClock(it.start, timeZone, locale)} –{' '}
                           {formatClock(it.end, timeZone, locale)}
                         </div>
-                        <div className="text-sm font-medium text-slate-900 dark:text-slate-100 tabular-nums">
+                        <div className="text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] tabular-nums">
                           {formatSec(it.end - it.start)}
                         </div>
                       </div>

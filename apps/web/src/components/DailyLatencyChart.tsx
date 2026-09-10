@@ -3,6 +3,7 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'rec
 import type { MonitorAnalyticsDayPoint } from '../api/types';
 import { useI18n } from '../app/I18nContext';
 import { useTheme } from '../app/ThemeContext';
+import { chartPalette } from '../theme/applePalette';
 import { suggestLatencyAxisCeiling } from '../utils/latencyScale';
 
 interface DailyLatencyChartProps {
@@ -52,15 +53,16 @@ export function DailyLatencyChart({ points, height = 220 }: DailyLatencyChartPro
 
   if (rawData.length === 0) {
     return (
-      <div className="flex items-center justify-center h-[220px] text-slate-500 dark:text-slate-400">
+      <div className="flex items-center justify-center h-[220px] text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
         {t('common.no_latency_data')}
       </div>
     );
   }
 
-  const axisColor = isDark ? '#64748b' : '#9ca3af';
-  const p95Color = isDark ? '#38bdf8' : '#0ea5e9';
-  const p50Color = isDark ? '#64748b' : '#94a3b8';
+  const palette = chartPalette(isDark);
+  const axisColor = palette.axis;
+  const p95Color = palette.accent;
+  const p50Color = palette.lineSecondary;
 
   return (
     <ResponsiveContainer width="100%" height={height}>
@@ -91,10 +93,10 @@ export function DailyLatencyChart({ points, height = 220 }: DailyLatencyChartPro
             ];
           }}
           contentStyle={{
-            backgroundColor: isDark ? '#1e293b' : '#ffffff',
-            borderColor: isDark ? '#334155' : '#e2e8f0',
+            backgroundColor: palette.tooltipBg,
+            borderColor: palette.tooltipBorder,
             borderRadius: '0.5rem',
-            color: isDark ? '#f1f5f9' : '#0f172a',
+            color: palette.tooltipText,
           }}
         />
         <Line

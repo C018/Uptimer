@@ -97,15 +97,15 @@ export function MaintenanceWindowForm(props: CreateProps | EditProps) {
       <div>
         <div className={labelClass}>{t('maintenance_form.affected_monitors')}</div>
         {monitors.length === 0 ? (
-          <div className="text-sm text-slate-500 dark:text-slate-400">
+          <div className="text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
             {t('maintenance_form.no_monitors')}
           </div>
         ) : (
-          <div className="max-h-40 overflow-y-auto border border-slate-200 dark:border-slate-600 rounded-lg p-3 space-y-2 bg-white dark:bg-slate-700">
+          <div className="max-h-40 overflow-y-auto border ui-border-hairline dark:border-[var(--color-border)] rounded-lg p-3 space-y-2 bg-[var(--color-card)] dark:bg-[var(--color-bg-secondary)]">
             {monitors.map((m) => (
               <label
                 key={m.id}
-                className="flex items-center gap-2.5 text-sm text-slate-700 dark:text-slate-300 cursor-pointer hover:text-slate-900 dark:hover:text-slate-100"
+                className="flex items-center gap-2.5 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-primary)] cursor-pointer hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-primary)]"
               >
                 <input
                   type="checkbox"
@@ -117,7 +117,7 @@ export function MaintenanceWindowForm(props: CreateProps | EditProps) {
                         : selectedMonitorIds.filter((id) => id !== m.id),
                     )
                   }
-                  className="rounded border-slate-300 dark:border-slate-500 dark:bg-slate-600"
+                  className="rounded ui-border-hairline dark:border-[var(--color-border)] dark:bg-[var(--color-bg-secondary)]"
                 />
                 <span>{m.name}</span>
               </label>
@@ -125,7 +125,7 @@ export function MaintenanceWindowForm(props: CreateProps | EditProps) {
           </div>
         )}
         {monitorsError && (
-          <div className="mt-2 text-sm text-red-500 dark:text-red-400">{monitorsError}</div>
+          <div className="mt-2 text-sm ui-text-down dark:ui-text-down">{monitorsError}</div>
         )}
       </div>
 
@@ -162,7 +162,7 @@ export function MaintenanceWindowForm(props: CreateProps | EditProps) {
           />
         </div>
       </div>
-      {timeError && <div className="text-sm text-red-500 dark:text-red-400">{timeError}</div>}
+      {timeError && <div className="text-sm ui-text-down dark:ui-text-down">{timeError}</div>}
 
       <div>
         <label className={labelClass}>{t('maintenance_form.message')}</label>
@@ -178,7 +178,7 @@ export function MaintenanceWindowForm(props: CreateProps | EditProps) {
       {normalized && (
         <div>
           <div className={labelClass}>{t('common.preview')}</div>
-          <div className="border border-slate-200 dark:border-slate-600 rounded-lg p-4 bg-slate-50 dark:bg-slate-700/50">
+          <div className="border ui-border-hairline dark:border-[var(--color-border)] rounded-lg p-4 bg-[var(--color-bg)] dark:bg-[var(--color-bg-secondary)]">
             <Markdown text={normalized} />
           </div>
         </div>

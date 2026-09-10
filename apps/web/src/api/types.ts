@@ -342,6 +342,44 @@ export interface PublicUptimeOverviewResponse {
 
 // Admin Types
 
+export type MonitorSslStatus = 'valid' | 'expiring' | 'expired' | 'error' | 'unknown';
+
+export interface MonitorSslState {
+  status: MonitorSslStatus;
+  hostname: string | null;
+  port: number | null;
+  days_remaining: number | null;
+  valid_from: number | null;
+  valid_to: number | null;
+  issuer: string | null;
+  subject: string | null;
+  serial_number: string | null;
+  checked_at: number | null;
+  last_error: string | null;
+}
+
+export interface MonitorSslCheckResult {
+  monitor: {
+    id: number;
+    name: string;
+    ssl_check_enabled: boolean;
+    ssl_warn_days: number;
+  };
+  ssl: {
+    status: MonitorSslStatus;
+    hostname: string | null;
+    port: number | null;
+    days_remaining: number | null;
+    valid_from: number | null;
+    valid_to: number | null;
+    issuer: string | null;
+    subject: string | null;
+    serial_number: string | null;
+    checked_at: number | null;
+    error: string | null;
+  };
+}
+
 export interface AdminMonitor {
   id: number;
   name: string;
@@ -367,6 +405,11 @@ export interface AdminMonitor {
   is_active: boolean;
   created_at: number;
   updated_at: number;
+
+  // SSL certificate monitoring
+  ssl_check_enabled: boolean;
+  ssl_warn_days: number;
+  ssl: MonitorSslState | null;
 
   // Runtime state (from monitor_state)
   status: MonitorStatus;
@@ -397,6 +440,8 @@ export interface CreateMonitorInput {
   response_forbidden_keyword?: string;
   response_forbidden_keyword_mode?: HttpResponseMatchMode;
   is_active?: boolean;
+  ssl_check_enabled?: boolean;
+  ssl_warn_days?: number;
 }
 
 export interface PatchMonitorInput {
@@ -420,6 +465,8 @@ export interface PatchMonitorInput {
   response_forbidden_keyword?: string | null;
   response_forbidden_keyword_mode?: HttpResponseMatchMode | null;
   is_active?: boolean;
+  ssl_check_enabled?: boolean;
+  ssl_warn_days?: number;
 }
 
 export interface ReorderMonitorGroupsInput {
@@ -457,8 +504,20 @@ export interface MonitorTestResult {
   };
 }
 
-export type NotificationChannelPreset = 'custom' | 'telegram';
+export type NotificationChannelPreset = 'custom' | 'telegram' | 'bark';
 export type TelegramParseMode = 'Markdown' | 'MarkdownV2' | 'HTML';
+export type BarkLevel = 'active' | 'timeSensitive' | 'passive' | 'critical';
+
+export type NotificationEventType =
+  | 'monitor.down'
+  | 'monitor.up'
+  | 'monitor.ssl_expiring'
+  | 'incident.created'
+  | 'incident.updated'
+  | 'incident.resolved'
+  | 'maintenance.started'
+  | 'maintenance.ended'
+  | 'test.ping';
 
 export interface CustomWebhookChannelConfig {
   preset?: 'custom';
@@ -469,16 +528,7 @@ export interface CustomWebhookChannelConfig {
   payload_type?: 'json' | 'param' | 'x-www-form-urlencoded';
   message_template?: string;
   payload_template?: unknown;
-  enabled_events?: Array<
-    | 'monitor.down'
-    | 'monitor.up'
-    | 'incident.created'
-    | 'incident.updated'
-    | 'incident.resolved'
-    | 'maintenance.started'
-    | 'maintenance.ended'
-    | 'test.ping'
-  >;
+  enabled_events?: NotificationEventType[];
   signing?: {
     enabled: boolean;
     secret_ref: string;
@@ -501,7 +551,37 @@ export interface TelegramChannelConfig {
   protect_content?: boolean;
 }
 
-export type WebhookChannelConfig = CustomWebhookChannelConfig | TelegramChannelConfig;
+export interface BarkChannelConfig {
+  preset: 'bark';
+
+  /** Plaintext device key — write-only (create / rotate). */
+  device_key?: string;
+  device_key_secret_ref?: string;
+  /** Read-only: whether a key is already stored (encrypted at rest or via secret). */
+  device_key_configured?: boolean;
+  device_key_source?: 'stored' | 'secret_ref';
+
+  /** Self-hosted Bark servers supported; defaults to the public gateway. */
+  server_url?: string;
+
+  level?: BarkLevel;
+  sound?: string;
+  group?: string;
+  icon?: string;
+  badge?: number;
+  is_archive?: boolean;
+  url?: string;
+  copy?: string;
+
+  timeout_ms?: number;
+  message_template?: string;
+  enabled_events?: NotificationEventType[];
+}
+
+export type WebhookChannelConfig =
+  | CustomWebhookChannelConfig
+  | TelegramChannelConfig
+  | BarkChannelConfig;
 
 export interface NotificationChannel {
   id: number;

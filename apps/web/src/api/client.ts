@@ -14,6 +14,7 @@ import type {
   LatencyResponse,
   MaintenanceWindow,
   MonitorTestResult,
+  MonitorSslCheckResult,
   Incident,
   IncidentUpdate,
   NotificationChannel,
@@ -440,6 +441,14 @@ export async function testMonitor(id: number): Promise<MonitorTestResult> {
     headers: getAuthHeaders(),
   });
   return handleResponse<MonitorTestResult>(res);
+}
+
+export async function checkMonitorSsl(id: number): Promise<MonitorSslCheckResult> {
+  const res = await fetch(`${API_BASE}/admin/monitors/${id}/ssl/check`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse<MonitorSslCheckResult>(res);
 }
 
 export async function reorderMonitorGroups(

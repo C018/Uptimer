@@ -10,11 +10,13 @@ import {
   getDb,
   httpHeadersJsonSchema,
   monitors,
+  monitorSslState,
   monitorState,
   parseDbJson,
   parseDbJsonNullable,
   serializeDbJson,
   serializeDbJsonNullable,
+  type BarkChannelConfig,
   type TelegramChannelConfig,
   type WebhookChannelConfig,
   webhookChannelConfigSchema,
@@ -44,6 +46,7 @@ import {
   dispatchWebhookToChannels,
   type WebhookChannel,
 } from '../notify/webhook';
+import { encryptBarkDeviceKey } from '../notify/bark';
 import { encryptTelegramBotToken } from '../notify/telegram-token';
 import { adminAnalyticsRoutes } from './admin-analytics';
 import { adminExportsRoutes } from './admin-exports';
@@ -66,6 +69,8 @@ import {
 import {
   createNotificationChannelInputSchema,
   patchNotificationChannelInputSchema,
+  type BarkChannelCreateInput,
+  type BarkChannelPatchInput,
   type TelegramChannelCreateInput,
   type TelegramChannelPatchInput,
 } from '../schemas/notification-channels';
@@ -260,6 +265,7 @@ function buildGroupReorderUpdate(
 function monitorRowToApi(
   row: typeof monitors.$inferSelect,
   state?: typeof monitorState.$inferSelect | null,
+  sslState?: typeof monitorSslState.$inferSelect | null,
 ) {
   const groupName = normalizeMonitorGroupName(row.groupName);
 
@@ -292,6 +298,8 @@ function monitorRowToApi(
     sort_order: row.sortOrder,
     show_on_status_page: row.showOnStatusPage,
     is_active: row.isActive,
+    ssl_check_enabled: row.sslCheckEnabled,
+    ssl_warn_days: row.sslWarnDays,
     created_at: row.createdAt,
     updated_at: row.updatedAt,
 
@@ -300,6 +308,23 @@ function monitorRowToApi(
     last_checked_at: state?.lastCheckedAt ?? null,
     last_latency_ms: state?.lastLatencyMs ?? null,
     last_error: state?.lastError ?? null,
+
+    // Certificate state (denormalized from monitor_ssl_state).
+    ssl: row.sslCheckEnabled
+      ? {
+          status: sslState?.status ?? 'unknown',
+          hostname: sslState?.hostname ?? null,
+          port: sslState?.port ?? null,
+          days_remaining: sslState?.daysRemaining ?? null,
+          valid_from: sslState?.validFrom ?? null,
+          valid_to: sslState?.validTo ?? null,
+          issuer: sslState?.issuer ?? null,
+          subject: sslState?.subject ?? null,
+          serial_number: sslState?.serialNumber ?? null,
+          checked_at: sslState?.checkedAt ?? null,
+          last_error: sslState?.lastError ?? null,
+        }
+      : null,
   };
 }
 
@@ -315,9 +340,10 @@ adminRoutes.get('/monitors', async (c) => {
   const db = getDb(c.env);
 
   const rows = await db
-    .select({ monitor: monitors, state: monitorState })
+    .select({ monitor: monitors, state: monitorState, sslState: monitorSslState })
     .from(monitors)
     .leftJoin(monitorState, eq(monitorState.monitorId, monitors.id))
+    .leftJoin(monitorSslState, eq(monitorSslState.monitorId, monitors.id))
     .orderBy(
       asc(monitors.groupSortOrder),
       asc(monitors.groupName),
@@ -327,7 +353,9 @@ adminRoutes.get('/monitors', async (c) => {
     .limit(limit)
     .all();
 
-  return c.json({ monitors: rows.map((r) => monitorRowToApi(r.monitor, r.state)) });
+  return c.json({
+    monitors: rows.map((r) => monitorRowToApi(r.monitor, r.state, r.sslState)),
+  });
 });
 
 adminRoutes.post('/monitors/groups/reorder', async (c) => {
@@ -495,6 +523,8 @@ adminRoutes.post('/monitors', async (c) => {
       sortOrder: input.sort_order ?? 0,
       showOnStatusPage: input.show_on_status_page ?? true,
       isActive: input.is_active ?? true,
+      sslCheckEnabled: input.ssl_check_enabled ?? false,
+      sslWarnDays: input.ssl_warn_days ?? 14,
       createdAt: now,
       updatedAt: now,
     })
@@ -634,6 +664,8 @@ adminRoutes.patch('/monitors/:id', async (c) => {
       sortOrder: input.sort_order ?? existing.sortOrder,
       showOnStatusPage: input.show_on_status_page ?? existing.showOnStatusPage,
       isActive: input.is_active ?? existing.isActive,
+      sslCheckEnabled: input.ssl_check_enabled ?? existing.sslCheckEnabled,
+      sslWarnDays: input.ssl_warn_days ?? existing.sslWarnDays,
       updatedAt: now,
     })
     .where(eq(monitors.id, id))
@@ -671,6 +703,7 @@ adminRoutes.delete('/monitors/:id', async (c) => {
     c.env.DB.prepare('DELETE FROM check_results WHERE monitor_id = ?1').bind(id),
     c.env.DB.prepare('DELETE FROM outages WHERE monitor_id = ?1').bind(id),
     c.env.DB.prepare('DELETE FROM monitor_state WHERE monitor_id = ?1').bind(id),
+    c.env.DB.prepare('DELETE FROM monitor_ssl_state WHERE monitor_id = ?1').bind(id),
     c.env.DB.prepare('DELETE FROM monitor_daily_rollups WHERE monitor_id = ?1').bind(id),
     c.env.DB.prepare('DELETE FROM maintenance_window_monitors WHERE monitor_id = ?1').bind(id),
     c.env.DB.prepare('DELETE FROM incident_monitors WHERE monitor_id = ?1').bind(id),
@@ -730,6 +763,47 @@ adminRoutes.post('/monitors/:id/test', async (c) => {
       http_status: outcome.httpStatus,
       error: outcome.error,
       attempts: outcome.attempts,
+    },
+  });
+});
+
+adminRoutes.post('/monitors/:id/ssl/check', async (c) => {
+  const id = z.coerce.number().int().positive().parse(c.req.param('id'));
+
+  const db = getDb(c.env);
+  const monitor = await db.select().from(monitors).where(eq(monitors.id, id)).get();
+
+  if (!monitor) {
+    throw new AppError(404, 'NOT_FOUND', 'Monitor not found');
+  }
+
+  if (!monitor.sslCheckEnabled) {
+    throw new AppError(400, 'INVALID_ARGUMENT', 'SSL monitoring is not enabled for this monitor');
+  }
+
+  const now = Math.floor(Date.now() / 1000);
+  const { checkMonitorSslNow } = await import('../scheduler/ssl-scan');
+  const outcome = await checkMonitorSslNow(c.env, monitor, now);
+
+  return c.json({
+    monitor: {
+      id: monitor.id,
+      name: monitor.name,
+      ssl_check_enabled: monitor.sslCheckEnabled,
+      ssl_warn_days: monitor.sslWarnDays,
+    },
+    ssl: {
+      status: outcome.status,
+      hostname: outcome.hostname,
+      port: outcome.port,
+      days_remaining: outcome.daysRemaining,
+      valid_from: outcome.validFrom,
+      valid_to: outcome.validTo,
+      issuer: outcome.issuer,
+      subject: outcome.subject,
+      serial_number: outcome.serialNumber,
+      checked_at: outcome.checkedAt,
+      error: outcome.error,
     },
   });
 });
@@ -843,19 +917,35 @@ type NotificationChannelRow = {
 type NotificationChannelInputConfig =
   | CustomWebhookChannelConfig
   | TelegramChannelCreateInput
-  | TelegramChannelPatchInput;
+  | TelegramChannelPatchInput
+  | BarkChannelCreateInput
+  | BarkChannelPatchInput;
 
 type TelegramApiChannelConfig = Omit<TelegramChannelConfig, 'bot_token_encrypted'> & {
   bot_token_configured: boolean;
   bot_token_source: 'stored' | 'secret_ref';
 };
 
-type NotificationChannelApiConfig = CustomWebhookChannelConfig | TelegramApiChannelConfig;
+type BarkApiChannelConfig = Omit<BarkChannelConfig, 'device_key_encrypted'> & {
+  device_key_configured: boolean;
+  device_key_source: 'stored' | 'secret_ref';
+};
+
+type NotificationChannelApiConfig =
+  | CustomWebhookChannelConfig
+  | TelegramApiChannelConfig
+  | BarkApiChannelConfig;
 
 function isTelegramInputConfig(
   config: NotificationChannelInputConfig,
 ): config is TelegramChannelCreateInput | TelegramChannelPatchInput {
   return config.preset === 'telegram';
+}
+
+function isBarkInputConfig(
+  config: NotificationChannelInputConfig,
+): config is BarkChannelCreateInput | BarkChannelPatchInput {
+  return config.preset === 'bark';
 }
 
 function isTelegramStoredConfig(
@@ -864,11 +954,56 @@ function isTelegramStoredConfig(
   return config?.preset === 'telegram';
 }
 
+function isBarkStoredConfig(config: WebhookChannelConfig | undefined): config is BarkChannelConfig {
+  return config?.preset === 'bark';
+}
+
 async function normalizeNotificationConfigForStorage(
   env: Env,
   inputConfig: NotificationChannelInputConfig,
   existingConfig?: WebhookChannelConfig,
 ): Promise<WebhookChannelConfig> {
+  if (isBarkInputConfig(inputConfig)) {
+    const { device_key: deviceKey, device_key_secret_ref: deviceKeySecretRef, ...barkConfig } =
+      inputConfig;
+    const baseBarkConfig = isBarkStoredConfig(existingConfig) ? existingConfig : undefined;
+
+    if (deviceKey) {
+      const adminToken = env.ADMIN_TOKEN?.trim();
+      if (!adminToken) {
+        throw new AppError(500, 'INTERNAL', 'Admin token not configured');
+      }
+
+      return {
+        ...barkConfig,
+        device_key_encrypted: await encryptBarkDeviceKey(adminToken, deviceKey),
+      };
+    }
+
+    if (deviceKeySecretRef) {
+      return {
+        ...barkConfig,
+        device_key_secret_ref: deviceKeySecretRef,
+      };
+    }
+
+    if (baseBarkConfig?.device_key_encrypted) {
+      return {
+        ...barkConfig,
+        device_key_encrypted: baseBarkConfig.device_key_encrypted,
+      };
+    }
+
+    if (baseBarkConfig?.device_key_secret_ref) {
+      return {
+        ...barkConfig,
+        device_key_secret_ref: baseBarkConfig.device_key_secret_ref,
+      };
+    }
+
+    throw new AppError(400, 'INVALID_ARGUMENT', 'Bark device key is required');
+  }
+
   if (!isTelegramInputConfig(inputConfig)) {
     return inputConfig;
   }
@@ -919,6 +1054,16 @@ async function normalizeNotificationConfigForStorage(
 function sanitizeNotificationConfigForApi(
   config: WebhookChannelConfig,
 ): NotificationChannelApiConfig {
+  if (isBarkStoredConfig(config)) {
+    const { device_key_encrypted: encryptedKey, ...barkConfig } = config;
+
+    return {
+      ...barkConfig,
+      device_key_configured: Boolean(encryptedKey || barkConfig.device_key_secret_ref),
+      device_key_source: barkConfig.device_key_secret_ref ? 'secret_ref' : 'stored',
+    };
+  }
+
   if (!isTelegramStoredConfig(config)) {
     return config;
   }

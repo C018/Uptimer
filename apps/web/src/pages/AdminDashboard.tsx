@@ -127,7 +127,7 @@ const navActionClass =
   'flex items-center justify-center h-10 rounded-lg px-3 text-base transition-colors';
 
 const tabContainerClass =
-  'flex gap-1 rounded-xl border border-slate-200/70 bg-white/80 p-1 shadow-sm dark:border-slate-700 dark:bg-slate-800/80';
+  'flex gap-1 rounded-xl border ui-border-hairline bg-[var(--material-thick)] p-1 shadow-sm dark:border-[var(--color-border)] dark:bg-[var(--color-bg-secondary)]';
 
 const SETTINGS_ICON_PATH =
   'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065zM15 12a3 3 0 11-6 0 3 3 0 016 0z';
@@ -907,10 +907,10 @@ export function AdminDashboard() {
   const toUiGroupLabel = (groupLabel: string) => displayGroupLabel(groupLabel, ungroupedLabel);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
-      <header className="bg-white dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
+    <div className="min-h-screen bg-[var(--color-bg)] dark:bg-[var(--color-bg-secondary)]">
+      <header className="bg-[var(--color-card)] dark:bg-[var(--color-bg-secondary)] border-b ui-border-hairline dark:border-[var(--color-border)]">
         <div className="mx-auto max-w-[92rem] px-4 py-3 sm:px-6 sm:py-4 lg:px-8 flex justify-between items-center">
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100">
+          <h1 className="text-xl sm:text-2xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
             {t('admin_dashboard.title')}
           </h1>
           <div className="flex items-center gap-1">
@@ -919,7 +919,7 @@ export function AdminDashboard() {
               to={ADMIN_ANALYTICS_PATH}
               className={cn(
                 navActionClass,
-                'text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-100',
+                'text-[var(--color-text-muted)] hover:bg-[var(--color-bg)] hover:text-[var(--color-text-primary)] dark:text-[var(--color-text-muted)] dark:hover:bg-[var(--color-bg-secondary)] dark:hover:text-[var(--color-text-primary)]',
               )}
             >
               <svg
@@ -941,7 +941,7 @@ export function AdminDashboard() {
               to="/"
               className={cn(
                 navActionClass,
-                'text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-100',
+                'text-[var(--color-text-muted)] hover:bg-[var(--color-bg)] hover:text-[var(--color-text-primary)] dark:text-[var(--color-text-muted)] dark:hover:bg-[var(--color-bg-secondary)] dark:hover:text-[var(--color-text-primary)]',
               )}
             >
               <svg
@@ -963,7 +963,7 @@ export function AdminDashboard() {
               onClick={logout}
               className={cn(
                 navActionClass,
-                'text-red-500 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-900/20 dark:hover:text-red-300',
+                'ui-text-down hover:ui-surface-down hover:ui-text-down dark:ui-text-down dark:hover:ui-surface-down dark:hover:ui-text-down',
               )}
             >
               <svg
@@ -996,8 +996,8 @@ export function AdminDashboard() {
               className={cn(
                 'flex items-center gap-1.5 rounded-lg px-3 py-2 text-base font-medium transition-all sm:gap-2 sm:px-4 whitespace-nowrap',
                 tab === tabItem.key
-                  ? 'bg-slate-900 text-white shadow-sm dark:bg-slate-100 dark:text-slate-900'
-                  : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200',
+                  ? 'bg-[var(--color-bg-secondary)] text-white shadow-sm dark:bg-[var(--color-bg)] dark:text-[var(--color-text-primary)]'
+                  : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] dark:text-[var(--color-text-muted)] dark:hover:text-[var(--color-text-primary)]',
               )}
             >
               <svg
@@ -1023,7 +1023,7 @@ export function AdminDashboard() {
         {tab === 'monitors' && (
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+              <h2 className="text-xl font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                 {t('admin_dashboard.tab.monitors')}
               </h2>
               <Button onClick={() => setModal({ type: 'create-monitor' })}>
@@ -1031,8 +1031,8 @@ export function AdminDashboard() {
               </Button>
             </div>
             {testingMonitorId !== null && (
-              <Card className="p-3 border-blue-200 bg-blue-50/70 dark:bg-blue-500/10 dark:border-blue-400/30">
-                <div className="text-sm text-blue-700 dark:text-blue-300">
+              <Card className="p-3 ui-border-accent ui-surface-accent dark:ui-surface-accent dark:ui-border-accent">
+                <div className="text-sm ui-text-accent dark:ui-text-accent">
                   {t('admin_dashboard.monitor_test_running', {
                     name: formatMonitorDisplayNameById(testingMonitorId, monitorNameById),
                   })}
@@ -1041,9 +1041,9 @@ export function AdminDashboard() {
             )}
 
             {monitorTestFeedback && (
-              <Card className="p-3 border-slate-200 dark:border-slate-600">
+              <Card className="p-3 ui-border-hairline dark:border-[var(--color-border)]">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                  <div className="text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                     {t('admin_dashboard.monitor_test_last', {
                       name: formatMonitorDisplayName(monitorTestFeedback.monitor),
                     })}
@@ -1062,10 +1062,10 @@ export function AdminDashboard() {
                     {statusLabel(monitorTestFeedback.result.status, t)}
                   </Badge>
                 </div>
-                <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                <div className="mt-1 text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
                   {formatDateTime(monitorTestFeedback.at, settings?.site_timezone)}
                 </div>
-                <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-600 dark:text-slate-300">
+                <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-primary)]">
                   <span>
                     {t('admin_dashboard.monitor_test_attempts', {
                       value: monitorTestFeedback.result.attempts,
@@ -1091,8 +1091,8 @@ export function AdminDashboard() {
                 <div
                   className={`mt-2 text-sm ${
                     monitorTestFeedback.result.error
-                      ? 'text-red-600 dark:text-red-400'
-                      : 'text-emerald-700 dark:text-emerald-400'
+                      ? 'ui-text-down dark:ui-text-down'
+                      : 'ui-text-up dark:ui-text-up'
                   }`}
                 >
                   {monitorTestFeedback.result.error ?? t('admin_dashboard.monitor_test_no_error')}
@@ -1101,25 +1101,25 @@ export function AdminDashboard() {
             )}
 
             {monitorTestError && (
-              <Card className="p-3 border-red-200 bg-red-50/70 dark:bg-red-500/10 dark:border-red-400/30">
-                <div className="text-sm font-medium text-red-700 dark:text-red-300">
+              <Card className="p-3 ui-border-down ui-surface-down dark:ui-surface-down dark:ui-border-down">
+                <div className="text-sm font-medium ui-text-down dark:ui-text-down">
                   {t('admin_dashboard.monitor_test_failed', {
                     name: formatMonitorDisplayNameById(monitorTestError.monitorId, monitorNameById),
                   })}
                 </div>
-                <div className="mt-1 text-xs text-red-600 dark:text-red-400">
+                <div className="mt-1 text-xs ui-text-down dark:ui-text-down">
                   {formatDateTime(monitorTestError.at, settings?.site_timezone)}
                 </div>
-                <div className="mt-1 text-sm text-red-700 dark:text-red-300">
+                <div className="mt-1 text-sm ui-text-down dark:ui-text-down">
                   {monitorTestError.message}
                 </div>
               </Card>
             )}
 
             {monitorsQuery.isLoading ? (
-              <div className="text-slate-500 dark:text-slate-400">{t('common.loading')}</div>
+              <div className="text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">{t('common.loading')}</div>
             ) : !monitorsQuery.data?.monitors.length ? (
-              <Card className="p-6 sm:p-8 text-center text-slate-500 dark:text-slate-400">
+              <Card className="p-6 sm:p-8 text-center text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
                 {t('admin_dashboard.no_monitors_yet')}
               </Card>
             ) : (
@@ -1127,10 +1127,10 @@ export function AdminDashboard() {
                 <div className="order-2 space-y-4 self-start lg:order-1 lg:sticky lg:top-6">
                   <Card className="p-3 sm:p-4">
                     <div className="flex items-center justify-between gap-2">
-                      <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                      <h3 className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                         {t('admin_dashboard.group_manager_title')}
                       </h3>
-                      <span className="text-xs text-slate-500 dark:text-slate-400">
+                      <span className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
                         {t('admin_dashboard.group_manager_count', {
                           count: orderedMonitorGroups.length,
                         })}
@@ -1143,8 +1143,8 @@ export function AdminDashboard() {
                         className={cn(
                           'flex w-full items-center justify-between rounded-lg border px-2.5 py-2 text-left text-xs transition-colors',
                           monitorGroupFilter === ALL_GROUPS_FILTER
-                            ? 'border-slate-900 bg-slate-900 text-white dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900'
-                            : 'border-slate-200 text-slate-600 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700',
+                            ? 'border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-white dark:ui-border-hairline dark:bg-[var(--color-bg)] dark:text-[var(--color-text-primary)]'
+                            : 'ui-border-hairline text-[var(--color-text-secondary)] hover:bg-[var(--color-bg)] dark:border-[var(--color-border)] dark:text-[var(--color-text-primary)] dark:hover:bg-[var(--color-bg-secondary)]',
                         )}
                       >
                         <span>{t('admin_dashboard.group_all')}</span>
@@ -1166,8 +1166,8 @@ export function AdminDashboard() {
                               className={cn(
                                 'flex min-w-0 flex-1 items-center justify-between rounded-lg border px-2.5 py-2 text-left text-xs transition-colors',
                                 active
-                                  ? 'border-slate-900 bg-slate-900 text-white dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900'
-                                  : 'border-slate-200 text-slate-600 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700',
+                                  ? 'border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-white dark:ui-border-hairline dark:bg-[var(--color-bg)] dark:text-[var(--color-text-primary)]'
+                                  : 'ui-border-hairline text-[var(--color-text-secondary)] hover:bg-[var(--color-bg)] dark:border-[var(--color-border)] dark:text-[var(--color-text-primary)] dark:hover:bg-[var(--color-bg-secondary)]',
                               )}
                             >
                               <span className="truncate">{toUiGroupLabel(group.label)}</span>
@@ -1186,7 +1186,7 @@ export function AdminDashboard() {
                                   })
                                 }
                                 disabled={isFirst || moveMonitorGroupMut.isPending}
-                                className="rounded border border-slate-300 px-2 py-1 text-[10px] font-semibold text-slate-600 hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
+                                className="rounded border ui-border-hairline px-2 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-bg)] disabled:cursor-not-allowed disabled:opacity-50 dark:border-[var(--color-border)] dark:text-[var(--color-text-primary)] dark:hover:bg-[var(--color-bg-secondary)]"
                               >
                                 ↑
                               </button>
@@ -1200,7 +1200,7 @@ export function AdminDashboard() {
                                   })
                                 }
                                 disabled={isLast || moveMonitorGroupMut.isPending}
-                                className="rounded border border-slate-300 px-2 py-1 text-[10px] font-semibold text-slate-600 hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
+                                className="rounded border ui-border-hairline px-2 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-bg)] disabled:cursor-not-allowed disabled:opacity-50 dark:border-[var(--color-border)] dark:text-[var(--color-text-primary)] dark:hover:bg-[var(--color-bg-secondary)]"
                               >
                                 ↓
                               </button>
@@ -1209,23 +1209,23 @@ export function AdminDashboard() {
                         );
                       })}
                     </div>
-                    <div className="mt-3 text-xs text-slate-500 dark:text-slate-400">
+                    <div className="mt-3 text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
                       {t('admin_dashboard.group_tip')}
                     </div>
                   </Card>
 
                   <Card className="p-3 sm:p-4">
-                    <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                    <h3 className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                       {t('admin_dashboard.bulk_assign_title')}
                     </h3>
-                    <div className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                    <div className="mt-2 text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
                       {t('admin_dashboard.bulk_assign_selected', {
                         count: selectedMonitorIds.length,
                       })}
                     </div>
                     <div className="mt-3 space-y-3">
                       <div>
-                        <label className="text-xs text-slate-500 dark:text-slate-400">
+                        <label className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
                           {t('admin_dashboard.bulk_assign_target_group')}
                         </label>
                         <input
@@ -1233,12 +1233,12 @@ export function AdminDashboard() {
                           value={bulkTargetGroup}
                           onChange={(e) => setBulkTargetGroup(e.target.value)}
                           list="monitor-groups-datalist"
-                          className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-sm text-slate-700 focus:border-slate-400 focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
+                          className="mt-1 block w-full rounded-lg border ui-border-hairline bg-[var(--color-card)] px-2.5 py-1.5 text-sm text-[var(--color-text-secondary)] focus:ui-border-hairline focus:outline-none dark:border-[var(--color-border)] dark:bg-[var(--color-bg-secondary)] dark:text-[var(--color-text-primary)]"
                           placeholder={ungroupedLabel}
                         />
                       </div>
                       <div>
-                        <label className="text-xs text-slate-500 dark:text-slate-400">
+                        <label className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
                           {t('admin_dashboard.bulk_assign_target_group_order')}
                         </label>
                         <input
@@ -1247,7 +1247,7 @@ export function AdminDashboard() {
                           onChange={(e) => setBulkTargetGroupSortOrderInput(e.target.value)}
                           min={-100000}
                           max={100000}
-                          className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-sm text-slate-700 focus:border-slate-400 focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
+                          className="mt-1 block w-full rounded-lg border ui-border-hairline bg-[var(--color-card)] px-2.5 py-1.5 text-sm text-[var(--color-text-secondary)] focus:ui-border-hairline focus:outline-none dark:border-[var(--color-border)] dark:bg-[var(--color-bg-secondary)] dark:text-[var(--color-text-primary)]"
                           placeholder={t(
                             'admin_dashboard.bulk_assign_target_group_order_placeholder',
                           )}
@@ -1271,27 +1271,27 @@ export function AdminDashboard() {
                         <button
                           type="button"
                           onClick={() => setSelectedMonitorIds([])}
-                          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-600 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
+                          className="w-full rounded-lg border ui-border-hairline px-3 py-2 text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg)] dark:border-[var(--color-border)] dark:text-[var(--color-text-primary)] dark:hover:bg-[var(--color-bg-secondary)]"
                         >
                           {t('admin_dashboard.bulk_assign_clear')}
                         </button>
                       )}
                     </div>
-                    <div className="mt-3 text-xs text-slate-500 dark:text-slate-400">
+                    <div className="mt-3 text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
                       {t('admin_dashboard.bulk_assign_help', { label: ungroupedLabel })}
                     </div>
                   </Card>
 
                   {monitorGroupReorderError && (
-                    <Card className="p-3 border-red-200 bg-red-50/70 dark:bg-red-500/10 dark:border-red-400/30">
-                      <div className="text-sm text-red-700 dark:text-red-300">
+                    <Card className="p-3 ui-border-down ui-surface-down dark:ui-surface-down dark:ui-border-down">
+                      <div className="text-sm ui-text-down dark:ui-text-down">
                         {monitorGroupReorderError}
                       </div>
                     </Card>
                   )}
                   {monitorGroupManageError && (
-                    <Card className="p-3 border-red-200 bg-red-50/70 dark:bg-red-500/10 dark:border-red-400/30">
-                      <div className="text-sm text-red-700 dark:text-red-300">
+                    <Card className="p-3 ui-border-down ui-surface-down dark:ui-surface-down dark:ui-border-down">
+                      <div className="text-sm ui-text-down dark:ui-text-down">
                         {monitorGroupManageError}
                       </div>
                     </Card>
@@ -1311,7 +1311,7 @@ export function AdminDashboard() {
                   <Card className="p-3 sm:p-4">
                     <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                       <div className="order-1 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                        <label className="text-xs text-slate-500 dark:text-slate-400">
+                        <label className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
                           <span className="mb-1 block">{t('common.group')}</span>
                           <select
                             value={monitorGroupMode}
@@ -1328,7 +1328,7 @@ export function AdminDashboard() {
                             </option>
                           </select>
                         </label>
-                        <label className="text-xs text-slate-500 dark:text-slate-400">
+                        <label className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
                           <span className="mb-1 block">{t('common.sort')}</span>
                           <select
                             value={monitorSortMode}
@@ -1348,7 +1348,7 @@ export function AdminDashboard() {
                             </option>
                           </select>
                         </label>
-                        <label className="text-xs text-slate-500 dark:text-slate-400 sm:col-span-2 xl:col-span-1">
+                        <label className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] sm:col-span-2 xl:col-span-1">
                           <span className="mb-1 block">{t('common.direction')}</span>
                           <select
                             value={monitorSortDirection}
@@ -1362,7 +1362,7 @@ export function AdminDashboard() {
                           </select>
                         </label>
                       </div>
-                      <div className="order-2 text-xs text-slate-500 dark:text-slate-400 xl:text-right">
+                      <div className="order-2 text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] xl:text-right">
                         {t('admin_dashboard.monitor_list_summary', {
                           filtered: filteredMonitors.length,
                           total: sortedMonitors.length,
@@ -1370,7 +1370,7 @@ export function AdminDashboard() {
                         {monitorGroupFilter !== ALL_GROUPS_FILTER && (
                           <>
                             {' '}
-                            <span className="font-semibold text-slate-700 dark:text-slate-200">
+                            <span className="font-semibold text-[var(--color-text-secondary)] dark:text-[var(--color-text-primary)]">
                               {t('admin_dashboard.monitor_list_summary_in_group', {
                                 group: toUiGroupLabel(monitorGroupFilter),
                               })}
@@ -1386,14 +1386,14 @@ export function AdminDashboard() {
                   </Card>
 
                   {filteredMonitors.length === 0 ? (
-                    <Card className="p-6 sm:p-8 text-center text-slate-500 dark:text-slate-400">
+                    <Card className="p-6 sm:p-8 text-center text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
                       {t('admin_dashboard.monitor_empty_in_group')}
                     </Card>
                   ) : (
                     <Card className="overflow-hidden">
                       <div className="overflow-x-auto">
                         <table className="w-full min-w-[860px] lg:min-w-[980px]">
-                          <thead className="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-100 dark:border-slate-700">
+                          <thead className="bg-[var(--color-bg)] dark:bg-[var(--color-bg-secondary)] border-b ui-border-hairline dark:border-[var(--color-border)]">
                             <tr>
                               <th className="px-3 sm:px-4 py-3 text-left">
                                 <input
@@ -1418,42 +1418,42 @@ export function AdminDashboard() {
                                     });
                                   }}
                                   aria-label={t('admin_dashboard.monitor_select_visible')}
-                                  className="h-4 w-4 rounded border-slate-300 text-slate-700 focus:ring-slate-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
+                                  className="h-4 w-4 rounded ui-border-hairline text-[var(--color-text-secondary)] focus:ring-[var(--color-border)] dark:border-[var(--color-border)] dark:bg-[var(--color-bg-secondary)] dark:text-[var(--color-text-primary)]"
                                 />
                               </th>
-                              <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                              <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] uppercase tracking-wide">
                                 {t('common.name')}
                               </th>
-                              <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                              <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] uppercase tracking-wide">
                                 {t('common.group')}
                               </th>
-                              <th className="hidden px-3 sm:px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide lg:table-cell">
+                              <th className="hidden px-3 sm:px-4 py-3 text-left text-xs font-medium text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] uppercase tracking-wide lg:table-cell">
                                 {t('admin_dashboard.monitor_table_group_order')}
                               </th>
-                              <th className="hidden px-3 sm:px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide lg:table-cell">
+                              <th className="hidden px-3 sm:px-4 py-3 text-left text-xs font-medium text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] uppercase tracking-wide lg:table-cell">
                                 {t('admin_dashboard.monitor_table_monitor_order')}
                               </th>
-                              <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                              <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] uppercase tracking-wide">
                                 {t('common.type')}
                               </th>
-                              <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                              <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] uppercase tracking-wide">
                                 {t('common.target')}
                               </th>
-                              <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                              <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] uppercase tracking-wide">
                                 {t('common.state')}
                               </th>
-                              <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                              <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] uppercase tracking-wide">
                                 {t('admin_dashboard.monitor_table_last_check')}
                               </th>
-                              <th className="hidden px-3 sm:px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide xl:table-cell">
+                              <th className="hidden px-3 sm:px-4 py-3 text-left text-xs font-medium text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] uppercase tracking-wide xl:table-cell">
                                 {t('admin_dashboard.monitor_table_last_error')}
                               </th>
-                              <th className="px-3 sm:px-4 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                              <th className="px-3 sm:px-4 py-3 text-right text-xs font-medium text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] uppercase tracking-wide">
                                 {t('common.actions')}
                               </th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
+                          <tbody className="divide-y divide-[var(--color-border-light)] dark:divide-[var(--color-border)]">
                             {filteredMonitors.map((m, index) => {
                               const groupLabel = monitorGroupLabel(m);
                               const prevMonitor = index > 0 ? filteredMonitors[index - 1] : null;
@@ -1467,10 +1467,10 @@ export function AdminDashboard() {
                               return (
                                 <Fragment key={m.id}>
                                   {showGroupHeader && (
-                                    <tr className="bg-slate-100/70 dark:bg-slate-800/80">
+                                    <tr className="bg-[var(--color-bg)] dark:bg-[var(--color-bg-secondary)]">
                                       <td
                                         colSpan={11}
-                                        className="px-3 sm:px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300"
+                                        className="px-3 sm:px-4 py-2 text-xs font-semibold uppercase tracking-wide text-[var(--color-text-muted)] dark:text-[var(--color-text-primary)]"
                                       >
                                         {t('admin_dashboard.monitor_group_header', {
                                           group: toUiGroupLabel(groupLabel),
@@ -1480,7 +1480,7 @@ export function AdminDashboard() {
                                       </td>
                                     </tr>
                                   )}
-                                  <tr className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+                                  <tr className="hover:bg-[var(--color-bg)] dark:hover:bg-[var(--color-bg-secondary)] transition-colors">
                                     <td className="px-3 sm:px-4 py-3">
                                       <input
                                         type="checkbox"
@@ -1495,13 +1495,13 @@ export function AdminDashboard() {
                                         aria-label={t('admin_dashboard.monitor_select_row', {
                                           name: formatMonitorDisplayName(m),
                                         })}
-                                        className="h-4 w-4 rounded border-slate-300 text-slate-700 focus:ring-slate-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
+                                        className="h-4 w-4 rounded ui-border-hairline text-[var(--color-text-secondary)] focus:ring-[var(--color-border)] dark:border-[var(--color-border)] dark:bg-[var(--color-bg-secondary)] dark:text-[var(--color-text-primary)]"
                                       />
                                     </td>
-                                    <td className="px-3 sm:px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-100">
+                                    <td className="px-3 sm:px-4 py-3 text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                                       <div className="flex flex-wrap items-center gap-1.5">
                                         <span className="truncate">{m.name}</span>
-                                        <span className="text-xs font-normal text-slate-500 dark:text-slate-400">
+                                        <span className="text-xs font-normal text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
                                           #{m.id}
                                         </span>
                                         {!m.show_on_status_page && (
@@ -1511,26 +1511,26 @@ export function AdminDashboard() {
                                         )}
                                       </div>
                                     </td>
-                                    <td className="px-3 sm:px-4 py-3 text-xs text-slate-600 dark:text-slate-300">
+                                    <td className="px-3 sm:px-4 py-3 text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-primary)]">
                                       {toUiGroupLabel(groupLabel)}
                                     </td>
-                                    <td className="hidden px-3 sm:px-4 py-3 text-xs text-slate-500 dark:text-slate-400 tabular-nums lg:table-cell">
+                                    <td className="hidden px-3 sm:px-4 py-3 text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] tabular-nums lg:table-cell">
                                       {m.group_sort_order}
                                     </td>
-                                    <td className="hidden px-3 sm:px-4 py-3 text-xs text-slate-500 dark:text-slate-400 tabular-nums lg:table-cell">
+                                    <td className="hidden px-3 sm:px-4 py-3 text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] tabular-nums lg:table-cell">
                                       {m.sort_order}
                                     </td>
                                     <td className="px-3 sm:px-4 py-3">
                                       <Badge variant="info">{m.type}</Badge>
                                     </td>
-                                    <td className="max-w-[160px] px-3 py-3 text-sm text-slate-500 dark:text-slate-400 sm:max-w-[220px] sm:px-4">
+                                    <td className="max-w-[160px] px-3 py-3 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] sm:max-w-[220px] sm:px-4">
                                       <div className="truncate">{m.target}</div>
                                       {m.display_url && (
                                         <a
                                           href={m.display_url}
                                           target="_blank"
                                           rel="noreferrer"
-                                          className="mt-0.5 block truncate text-xs text-slate-700 underline decoration-slate-300 underline-offset-2 hover:text-slate-950 dark:text-slate-300 dark:decoration-slate-600 dark:hover:text-slate-50"
+                                          className="mt-0.5 block truncate text-xs text-[var(--color-text-secondary)] underline decoration-[var(--color-border)] underline-offset-2 transition-colors duration-200 ease-apple hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-primary)]"
                                           title={m.display_url}
                                         >
                                           {t('common.display_url')}: {m.display_url}
@@ -1557,9 +1557,31 @@ export function AdminDashboard() {
                                         {!m.is_active && (
                                           <Badge variant="unknown">{t('common.inactive')}</Badge>
                                         )}
+                                        {m.ssl_check_enabled && m.ssl && (
+                                          <Badge
+                                            variant={
+                                              m.ssl.status === 'valid'
+                                                ? 'up'
+                                                : m.ssl.status === 'expiring'
+                                                  ? 'paused'
+                                                  : m.ssl.status === 'expired' ||
+                                                      m.ssl.status === 'error'
+                                                    ? 'down'
+                                                    : 'unknown'
+                                            }
+                                          >
+                                            {m.ssl.status === 'expired'
+                                              ? t('admin_dashboard.ssl_expired_short')
+                                              : m.ssl.days_remaining != null
+                                                ? t('admin_dashboard.ssl_days_remaining_short', {
+                                                    days: m.ssl.days_remaining,
+                                                  })
+                                                : t('admin_dashboard.ssl_label')}
+                                          </Badge>
+                                        )}
                                       </div>
                                     </td>
-                                    <td className="px-3 sm:px-4 py-3 text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                                    <td className="px-3 sm:px-4 py-3 text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] whitespace-nowrap">
                                       {m.last_checked_at ? (
                                         <>
                                           {formatDateTime(
@@ -1574,7 +1596,7 @@ export function AdminDashboard() {
                                         '-'
                                       )}
                                     </td>
-                                    <td className="hidden max-w-[260px] px-3 sm:px-4 py-3 text-xs text-slate-500 dark:text-slate-400 xl:table-cell">
+                                    <td className="hidden max-w-[260px] px-3 sm:px-4 py-3 text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] xl:table-cell">
                                       <span
                                         className="block truncate"
                                         title={m.last_error ?? undefined}
@@ -1594,7 +1616,7 @@ export function AdminDashboard() {
                                           disabled={testMonitorMut.isPending}
                                           className={cn(
                                             TABLE_ACTION_BUTTON_CLASS,
-                                            'text-blue-600 hover:bg-blue-50 hover:text-blue-800 dark:text-blue-400 dark:hover:bg-blue-900/20 dark:hover:text-blue-300 disabled:opacity-50',
+                                            'ui-text-accent hover:ui-surface-accent hover:ui-text-accent dark:ui-text-accent dark:hover:ui-surface-accent dark:hover:ui-text-accent disabled:opacity-50',
                                           )}
                                         >
                                           {testingMonitorId === m.id
@@ -1616,7 +1638,7 @@ export function AdminDashboard() {
                                           }
                                           className={cn(
                                             TABLE_ACTION_BUTTON_CLASS,
-                                            'text-amber-700 hover:bg-amber-50 hover:text-amber-900 dark:text-amber-300 dark:hover:bg-amber-900/20 dark:hover:text-amber-200 disabled:opacity-50',
+                                            'ui-text-warn hover:ui-surface-warn hover:ui-text-warn dark:ui-text-warn dark:hover:ui-surface-warn dark:hover:ui-text-warn disabled:opacity-50',
                                           )}
                                         >
                                           {m.status === 'paused'
@@ -1631,7 +1653,7 @@ export function AdminDashboard() {
                                           }}
                                           className={cn(
                                             TABLE_ACTION_BUTTON_CLASS,
-                                            'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200',
+                                            'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg)] hover:text-[var(--color-text-primary)] dark:text-[var(--color-text-muted)] dark:hover:bg-[var(--color-bg-secondary)] dark:hover:text-[var(--color-text-primary)]',
                                           )}
                                         >
                                           {t('common.edit')}
@@ -1643,7 +1665,7 @@ export function AdminDashboard() {
                                           }
                                           className={cn(
                                             TABLE_ACTION_BUTTON_CLASS,
-                                            'text-red-500 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-900/20 dark:hover:text-red-300',
+                                            'ui-text-down hover:ui-surface-down hover:ui-text-down dark:ui-text-down dark:hover:ui-surface-down dark:hover:ui-text-down',
                                           )}
                                         >
                                           {t('common.delete')}
@@ -1668,7 +1690,7 @@ export function AdminDashboard() {
         {tab === 'notifications' && (
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+              <h2 className="text-xl font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                 {t('admin_dashboard.notification_channels_title')}
               </h2>
               <Button onClick={() => setModal({ type: 'create-channel' })}>
@@ -1676,8 +1698,8 @@ export function AdminDashboard() {
               </Button>
             </div>
             {testingChannelId !== null && (
-              <Card className="p-3 border-blue-200 bg-blue-50/70 dark:bg-blue-500/10 dark:border-blue-400/30">
-                <div className="text-sm text-blue-700 dark:text-blue-300">
+              <Card className="p-3 ui-border-accent ui-surface-accent dark:ui-surface-accent dark:ui-border-accent">
+                <div className="text-sm ui-text-accent dark:ui-text-accent">
                   {t('admin_dashboard.webhook_test_running', {
                     name: channelNameById.get(testingChannelId) ?? `#${testingChannelId}`,
                   })}
@@ -1686,9 +1708,9 @@ export function AdminDashboard() {
             )}
 
             {channelTestFeedback && (
-              <Card className="p-3 border-slate-200 dark:border-slate-600">
+              <Card className="p-3 ui-border-hairline dark:border-[var(--color-border)]">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                  <div className="text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                     {t('admin_dashboard.webhook_test_last', {
                       name:
                         channelNameById.get(channelTestFeedback.channelId) ??
@@ -1711,10 +1733,10 @@ export function AdminDashboard() {
                         : t('admin_dashboard.webhook_test_unknown')}
                   </Badge>
                 </div>
-                <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                <div className="mt-1 text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
                   {formatDateTime(channelTestFeedback.at, settings?.site_timezone)}
                 </div>
-                <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-600 dark:text-slate-300">
+                <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-primary)]">
                   <span>
                     {t('admin_dashboard.webhook_test_http', {
                       value: channelTestFeedback.delivery?.http_status ?? '-',
@@ -1729,8 +1751,8 @@ export function AdminDashboard() {
                 <div
                   className={`mt-2 text-sm ${
                     channelTestFeedback.delivery?.status === 'success'
-                      ? 'text-emerald-700 dark:text-emerald-400'
-                      : 'text-red-600 dark:text-red-400'
+                      ? 'ui-text-up dark:ui-text-up'
+                      : 'ui-text-down dark:ui-text-down'
                   }`}
                 >
                   {channelTestFeedback.delivery?.error
@@ -1743,56 +1765,56 @@ export function AdminDashboard() {
             )}
 
             {channelTestError && (
-              <Card className="p-3 border-red-200 bg-red-50/70 dark:bg-red-500/10 dark:border-red-400/30">
-                <div className="text-sm font-medium text-red-700 dark:text-red-300">
+              <Card className="p-3 ui-border-down ui-surface-down dark:ui-surface-down dark:ui-border-down">
+                <div className="text-sm font-medium ui-text-down dark:ui-text-down">
                   {t('admin_dashboard.webhook_test_failed', {
                     name:
                       channelNameById.get(channelTestError.channelId) ??
                       `#${channelTestError.channelId}`,
                   })}
                 </div>
-                <div className="mt-1 text-xs text-red-600 dark:text-red-400">
+                <div className="mt-1 text-xs ui-text-down dark:ui-text-down">
                   {formatDateTime(channelTestError.at, settings?.site_timezone)}
                 </div>
-                <div className="mt-1 text-sm text-red-700 dark:text-red-300">
+                <div className="mt-1 text-sm ui-text-down dark:ui-text-down">
                   {channelTestError.message}
                 </div>
               </Card>
             )}
 
             {channelsQuery.isLoading ? (
-              <div className="text-slate-500 dark:text-slate-400">{t('common.loading')}</div>
+              <div className="text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">{t('common.loading')}</div>
             ) : !channelsQuery.data?.notification_channels.length ? (
-              <Card className="p-6 sm:p-8 text-center text-slate-500 dark:text-slate-400">
+              <Card className="p-6 sm:p-8 text-center text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
                 {t('admin_dashboard.no_channels_yet')}
               </Card>
             ) : (
               <Card className="overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full min-w-[500px]">
-                    <thead className="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-100 dark:border-slate-700">
+                    <thead className="bg-[var(--color-bg)] dark:bg-[var(--color-bg-secondary)] border-b ui-border-hairline dark:border-[var(--color-border)]">
                       <tr>
-                        <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                        <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] uppercase tracking-wide">
                           {t('common.name')}
                         </th>
-                        <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                        <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] uppercase tracking-wide">
                           {t('common.type')}
                         </th>
-                        <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                        <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] uppercase tracking-wide">
                           {t('common.target')}
                         </th>
-                        <th className="px-3 sm:px-4 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                        <th className="px-3 sm:px-4 py-3 text-right text-xs font-medium text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] uppercase tracking-wide">
                           {t('common.actions')}
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
+                    <tbody className="divide-y divide-[var(--color-border-light)] dark:divide-[var(--color-border)]">
                       {channelsQuery.data.notification_channels.map((ch) => (
                         <tr
                           key={ch.id}
-                          className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+                          className="hover:bg-[var(--color-bg)] dark:hover:bg-[var(--color-bg-secondary)] transition-colors"
                         >
-                          <td className="px-3 sm:px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-100">
+                          <td className="px-3 sm:px-4 py-3 text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                             {ch.name}
                           </td>
                           <td className="px-3 sm:px-4 py-3">
@@ -1802,7 +1824,7 @@ export function AdminDashboard() {
                                 : ch.type}
                             </Badge>
                           </td>
-                          <td className="px-3 sm:px-4 py-3 text-sm text-slate-500 dark:text-slate-400 truncate max-w-[200px]">
+                          <td className="px-3 sm:px-4 py-3 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] truncate max-w-[200px]">
                             {ch.config_json.preset === 'telegram'
                               ? `${t('notification_form.preset_telegram')}: ${ch.config_json.chat_id}`
                               : ch.config_json.url}
@@ -1819,7 +1841,7 @@ export function AdminDashboard() {
                                 disabled={testChannelMut.isPending}
                                 className={cn(
                                   TABLE_ACTION_BUTTON_CLASS,
-                                  'text-blue-600 hover:bg-blue-50 hover:text-blue-800 dark:text-blue-400 dark:hover:bg-blue-900/20 dark:hover:text-blue-300 disabled:opacity-50',
+                                  'ui-text-accent hover:ui-surface-accent hover:ui-text-accent dark:ui-text-accent dark:hover:ui-surface-accent dark:hover:ui-text-accent disabled:opacity-50',
                                 )}
                               >
                                 {testingChannelId === ch.id
@@ -1830,7 +1852,7 @@ export function AdminDashboard() {
                                 onClick={() => setModal({ type: 'edit-channel', channel: ch })}
                                 className={cn(
                                   TABLE_ACTION_BUTTON_CLASS,
-                                  'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200',
+                                  'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg)] hover:text-[var(--color-text-primary)] dark:text-[var(--color-text-muted)] dark:hover:bg-[var(--color-bg-secondary)] dark:hover:text-[var(--color-text-primary)]',
                                 )}
                               >
                                 {t('common.edit')}
@@ -1842,7 +1864,7 @@ export function AdminDashboard() {
                                 }
                                 className={cn(
                                   TABLE_ACTION_BUTTON_CLASS,
-                                  'text-red-500 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-900/20 dark:hover:text-red-300',
+                                  'ui-text-down hover:ui-surface-down hover:ui-text-down dark:ui-text-down dark:hover:ui-surface-down dark:hover:ui-text-down',
                                 )}
                               >
                                 {t('common.delete')}
@@ -1862,7 +1884,7 @@ export function AdminDashboard() {
         {tab === 'settings' && (
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+              <h2 className="text-xl font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                 {t('admin_dashboard.tab.settings')}
               </h2>
             </div>
@@ -1870,10 +1892,10 @@ export function AdminDashboard() {
             <Card className="p-4 sm:p-5">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
-                  <div className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                  <div className="text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                     {t('admin_settings.uptime_rating.title')}
                   </div>
-                  <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  <div className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] mt-1">
                     {t('admin_settings.uptime_rating.help')}
                   </div>
                 </div>
@@ -1901,13 +1923,13 @@ export function AdminDashboard() {
               </div>
 
               {settingsQuery.isError && (
-                <div className="mt-3 text-sm text-red-600 dark:text-red-400">
+                <div className="mt-3 text-sm ui-text-down dark:ui-text-down">
                   {t('admin_dashboard.failed_load_settings')}
                 </div>
               )}
 
               {patchSettingsMut.isError && !localePatchFallbackActive && (
-                <div className="mt-3 text-sm text-red-600 dark:text-red-400">
+                <div className="mt-3 text-sm ui-text-down dark:ui-text-down">
                   {formatError(patchSettingsMut.error) ??
                     t('admin_dashboard.failed_update_settings')}
                 </div>
@@ -1917,10 +1939,10 @@ export function AdminDashboard() {
             <Card className="p-4 sm:p-5">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
-                  <div className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                  <div className="text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                     {t('admin_settings.locale.title')}
                   </div>
-                  <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  <div className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] mt-1">
                     {t('admin_settings.locale.help')}
                   </div>
                 </div>
@@ -1945,7 +1967,7 @@ export function AdminDashboard() {
                 </select>
               </div>
               {localePatchFallbackActive && (
-                <div className="mt-3 text-xs text-amber-700 dark:text-amber-300">
+                <div className="mt-3 text-xs ui-text-warn dark:ui-text-warn">
                   {t('admin_settings.locale.local_only')}
                 </div>
               )}
@@ -1954,17 +1976,17 @@ export function AdminDashboard() {
             <Card className="p-4 sm:p-5">
               <div className="space-y-4">
                 <div>
-                  <div className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                  <div className="text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                     {t('admin_settings.branding.title')}
                   </div>
-                  <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  <div className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] mt-1">
                     {t('admin_settings.branding.help')}
                   </div>
                 </div>
 
                 <div className="grid sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
+                    <label className="block text-xs font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mb-1">
                       {t('admin_settings.branding.site_title')}
                     </label>
                     <input
@@ -1986,12 +2008,12 @@ export function AdminDashboard() {
                         (e.currentTarget as HTMLInputElement).blur();
                       }}
                       disabled={settingsQuery.isLoading || !settingsDraft}
-                      className="w-full border dark:border-slate-600 rounded px-3 py-2 text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 disabled:opacity-50"
+                      className="w-full border dark:border-[var(--color-border)] rounded px-3 py-2 text-sm bg-[var(--color-card)] dark:bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] disabled:opacity-50"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
+                    <label className="block text-xs font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mb-1">
                       {t('admin_settings.branding.timezone')}
                     </label>
                     <input
@@ -2018,16 +2040,16 @@ export function AdminDashboard() {
                       }}
                       disabled={settingsQuery.isLoading || !settingsDraft}
                       placeholder="UTC"
-                      className="w-full border dark:border-slate-600 rounded px-3 py-2 text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 disabled:opacity-50"
+                      className="w-full border dark:border-[var(--color-border)] rounded px-3 py-2 text-sm bg-[var(--color-card)] dark:bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] disabled:opacity-50"
                     />
-                    <div className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+                    <div className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] mt-1">
                       {t('admin_settings.branding.timezone_help')}
                     </div>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
+                  <label className="block text-xs font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mb-1">
                     {t('admin_settings.branding.site_description')}
                   </label>
                   <textarea
@@ -2050,7 +2072,7 @@ export function AdminDashboard() {
                     }}
                     disabled={settingsQuery.isLoading || !settingsDraft}
                     rows={3}
-                    className="w-full border dark:border-slate-600 rounded px-3 py-2 text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 disabled:opacity-50"
+                    className="w-full border dark:border-[var(--color-border)] rounded px-3 py-2 text-sm bg-[var(--color-card)] dark:bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] disabled:opacity-50"
                   />
                 </div>
               </div>
@@ -2059,10 +2081,10 @@ export function AdminDashboard() {
             <Card className="p-4 sm:p-5">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
-                  <div className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                  <div className="text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                     {t('admin_settings.retention.title')}
                   </div>
-                  <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  <div className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] mt-1">
                     {t('admin_settings.retention.help')}
                   </div>
                 </div>
@@ -2094,7 +2116,7 @@ export function AdminDashboard() {
                     (e.currentTarget as HTMLInputElement).blur();
                   }}
                   disabled={settingsQuery.isLoading || !settingsDraft}
-                  className="w-40 border dark:border-slate-600 rounded px-3 py-2 text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 disabled:opacity-50"
+                  className="w-40 border dark:border-[var(--color-border)] rounded px-3 py-2 text-sm bg-[var(--color-card)] dark:bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] disabled:opacity-50"
                 />
               </div>
             </Card>
@@ -2102,17 +2124,17 @@ export function AdminDashboard() {
             <Card className="p-4 sm:p-5">
               <div className="space-y-4">
                 <div>
-                  <div className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                  <div className="text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                     {t('admin_settings.state_machine.title')}
                   </div>
-                  <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  <div className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] mt-1">
                     {t('admin_settings.state_machine.help')}
                   </div>
                 </div>
 
                 <div className="grid sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
+                    <label className="block text-xs font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mb-1">
                       {t('admin_settings.state_machine.failures_to_down')}
                     </label>
                     <input
@@ -2141,11 +2163,11 @@ export function AdminDashboard() {
                         (e.currentTarget as HTMLInputElement).blur();
                       }}
                       disabled={settingsQuery.isLoading || !settingsDraft}
-                      className="w-full border dark:border-slate-600 rounded px-3 py-2 text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 disabled:opacity-50"
+                      className="w-full border dark:border-[var(--color-border)] rounded px-3 py-2 text-sm bg-[var(--color-card)] dark:bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] disabled:opacity-50"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
+                    <label className="block text-xs font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mb-1">
                       {t('admin_settings.state_machine.successes_to_up')}
                     </label>
                     <input
@@ -2174,7 +2196,7 @@ export function AdminDashboard() {
                         (e.currentTarget as HTMLInputElement).blur();
                       }}
                       disabled={settingsQuery.isLoading || !settingsDraft}
-                      className="w-full border dark:border-slate-600 rounded px-3 py-2 text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 disabled:opacity-50"
+                      className="w-full border dark:border-[var(--color-border)] rounded px-3 py-2 text-sm bg-[var(--color-card)] dark:bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] disabled:opacity-50"
                     />
                   </div>
                 </div>
@@ -2184,17 +2206,17 @@ export function AdminDashboard() {
             <Card className="p-4 sm:p-5">
               <div className="space-y-4">
                 <div>
-                  <div className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                  <div className="text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                     {t('admin_settings.defaults.title')}
                   </div>
-                  <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  <div className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] mt-1">
                     {t('admin_settings.defaults.help')}
                   </div>
                 </div>
 
                 <div className="grid sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
+                    <label className="block text-xs font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mb-1">
                       {t('admin_settings.defaults.overview_range')}
                     </label>
                     <select
@@ -2215,7 +2237,7 @@ export function AdminDashboard() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
+                    <label className="block text-xs font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mb-1">
                       {t('admin_settings.defaults.monitor_range')}
                     </label>
                     <select
@@ -2245,7 +2267,7 @@ export function AdminDashboard() {
         {tab === 'incidents' && (
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+              <h2 className="text-xl font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                 {t('admin_dashboard.tab.incidents')}
               </h2>
               <Button onClick={() => setModal({ type: 'create-incident' })}>
@@ -2253,44 +2275,44 @@ export function AdminDashboard() {
               </Button>
             </div>
             {incidentsQuery.isLoading ? (
-              <div className="text-slate-500 dark:text-slate-400">{t('common.loading')}</div>
+              <div className="text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">{t('common.loading')}</div>
             ) : !incidentsQuery.data?.incidents.length ? (
-              <Card className="p-6 sm:p-8 text-center text-slate-500 dark:text-slate-400">
+              <Card className="p-6 sm:p-8 text-center text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
                 {t('admin_dashboard.no_incidents_yet')}
               </Card>
             ) : (
               <Card className="overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full min-w-[650px]">
-                    <thead className="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-100 dark:border-slate-700">
+                    <thead className="bg-[var(--color-bg)] dark:bg-[var(--color-bg-secondary)] border-b ui-border-hairline dark:border-[var(--color-border)]">
                       <tr>
-                        <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                        <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] uppercase tracking-wide">
                           {t('common.title_label')}
                         </th>
-                        <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                        <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] uppercase tracking-wide">
                           {t('common.monitors')}
                         </th>
-                        <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                        <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] uppercase tracking-wide">
                           {t('common.state')}
                         </th>
-                        <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                        <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] uppercase tracking-wide">
                           {t('common.impact')}
                         </th>
-                        <th className="px-3 sm:px-4 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                        <th className="px-3 sm:px-4 py-3 text-right text-xs font-medium text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] uppercase tracking-wide">
                           {t('common.actions')}
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
+                    <tbody className="divide-y divide-[var(--color-border-light)] dark:divide-[var(--color-border)]">
                       {incidentsQuery.data.incidents.map((it) => (
                         <tr
                           key={it.id}
-                          className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+                          className="hover:bg-[var(--color-bg)] dark:hover:bg-[var(--color-bg-secondary)] transition-colors"
                         >
-                          <td className="px-3 sm:px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-100">
+                          <td className="px-3 sm:px-4 py-3 text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                             {it.title}
                           </td>
-                          <td className="px-3 sm:px-4 py-3 text-sm text-slate-500 dark:text-slate-400 truncate max-w-[150px]">
+                          <td className="px-3 sm:px-4 py-3 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] truncate max-w-[150px]">
                             {it.monitor_ids
                               .map((id) => formatMonitorDisplayNameById(id, monitorNameById))
                               .join(', ')}
@@ -2324,7 +2346,7 @@ export function AdminDashboard() {
                                 disabled={it.status === 'resolved'}
                                 className={cn(
                                   TABLE_ACTION_BUTTON_CLASS,
-                                  'text-blue-600 hover:bg-blue-50 hover:text-blue-800 dark:text-blue-400 dark:hover:bg-blue-900/20 dark:hover:text-blue-300 disabled:opacity-50',
+                                  'ui-text-accent hover:ui-surface-accent hover:ui-text-accent dark:ui-text-accent dark:hover:ui-surface-accent dark:hover:ui-text-accent disabled:opacity-50',
                                 )}
                               >
                                 {t('common.update')}
@@ -2334,7 +2356,7 @@ export function AdminDashboard() {
                                 disabled={it.status === 'resolved'}
                                 className={cn(
                                   TABLE_ACTION_BUTTON_CLASS,
-                                  'text-emerald-600 hover:bg-emerald-50 hover:text-emerald-800 dark:text-emerald-400 dark:hover:bg-emerald-900/20 dark:hover:text-emerald-300 disabled:opacity-50',
+                                  'ui-text-up hover:ui-surface-up hover:ui-text-up dark:ui-text-up dark:hover:ui-surface-up dark:hover:ui-text-up disabled:opacity-50',
                                 )}
                               >
                                 {t('resolve_incident.resolve')}
@@ -2346,7 +2368,7 @@ export function AdminDashboard() {
                                 }
                                 className={cn(
                                   TABLE_ACTION_BUTTON_CLASS,
-                                  'text-red-500 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-900/20 dark:hover:text-red-300',
+                                  'ui-text-down hover:ui-surface-down hover:ui-text-down dark:ui-text-down dark:hover:ui-surface-down dark:hover:ui-text-down',
                                 )}
                               >
                                 {t('common.delete')}
@@ -2366,7 +2388,7 @@ export function AdminDashboard() {
         {tab === 'maintenance' && (
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+              <h2 className="text-xl font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                 {t('admin_dashboard.maintenance_windows_title')}
               </h2>
               <Button onClick={() => setModal({ type: 'create-maintenance' })}>
@@ -2374,35 +2396,35 @@ export function AdminDashboard() {
               </Button>
             </div>
             {maintenanceQuery.isLoading ? (
-              <div className="text-slate-500 dark:text-slate-400">{t('common.loading')}</div>
+              <div className="text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">{t('common.loading')}</div>
             ) : !maintenanceQuery.data?.maintenance_windows.length ? (
-              <Card className="p-6 sm:p-8 text-center text-slate-500 dark:text-slate-400">
+              <Card className="p-6 sm:p-8 text-center text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
                 {t('admin_dashboard.no_maintenance_yet')}
               </Card>
             ) : (
               <Card className="overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full min-w-[650px]">
-                    <thead className="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-100 dark:border-slate-700">
+                    <thead className="bg-[var(--color-bg)] dark:bg-[var(--color-bg-secondary)] border-b ui-border-hairline dark:border-[var(--color-border)]">
                       <tr>
-                        <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                        <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] uppercase tracking-wide">
                           {t('common.title_label')}
                         </th>
-                        <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                        <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] uppercase tracking-wide">
                           {t('common.monitors')}
                         </th>
-                        <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                        <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] uppercase tracking-wide">
                           {t('common.schedule')}
                         </th>
-                        <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                        <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] uppercase tracking-wide">
                           {t('common.state')}
                         </th>
-                        <th className="px-3 sm:px-4 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                        <th className="px-3 sm:px-4 py-3 text-right text-xs font-medium text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] uppercase tracking-wide">
                           {t('common.actions')}
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
+                    <tbody className="divide-y divide-[var(--color-border-light)] dark:divide-[var(--color-border)]">
                       {maintenanceQuery.data.maintenance_windows.map((w) => {
                         const now = Math.floor(Date.now() / 1000);
                         const state =
@@ -2414,17 +2436,17 @@ export function AdminDashboard() {
                         return (
                           <tr
                             key={w.id}
-                            className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+                            className="hover:bg-[var(--color-bg)] dark:hover:bg-[var(--color-bg-secondary)] transition-colors"
                           >
-                            <td className="px-3 sm:px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-100">
+                            <td className="px-3 sm:px-4 py-3 text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                               {w.title}
                             </td>
-                            <td className="px-3 sm:px-4 py-3 text-sm text-slate-500 dark:text-slate-400 truncate max-w-[120px]">
+                            <td className="px-3 sm:px-4 py-3 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] truncate max-w-[120px]">
                               {w.monitor_ids
                                 .map((id) => formatMonitorDisplayNameById(id, monitorNameById))
                                 .join(', ')}
                             </td>
-                            <td className="px-3 sm:px-4 py-3 text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                            <td className="px-3 sm:px-4 py-3 text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] whitespace-nowrap">
                               {formatDateTime(w.starts_at, settings?.site_timezone)} –{' '}
                               {formatDateTime(w.ends_at, settings?.site_timezone)}
                             </td>
@@ -2447,7 +2469,7 @@ export function AdminDashboard() {
                                   onClick={() => setModal({ type: 'edit-maintenance', window: w })}
                                   className={cn(
                                     TABLE_ACTION_BUTTON_CLASS,
-                                    'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200',
+                                    'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg)] hover:text-[var(--color-text-primary)] dark:text-[var(--color-text-muted)] dark:hover:bg-[var(--color-bg-secondary)] dark:hover:text-[var(--color-text-primary)]',
                                   )}
                                 >
                                   {t('common.edit')}
@@ -2459,7 +2481,7 @@ export function AdminDashboard() {
                                   }
                                   className={cn(
                                     TABLE_ACTION_BUTTON_CLASS,
-                                    'text-red-500 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-900/20 dark:hover:text-red-300',
+                                    'ui-text-down hover:ui-surface-down hover:ui-text-down dark:ui-text-down dark:hover:ui-surface-down dark:hover:ui-text-down',
                                   )}
                                 >
                                   {t('common.delete')}
@@ -2481,7 +2503,7 @@ export function AdminDashboard() {
       {modal.type !== 'none' && (
         <div className={MODAL_OVERLAY_CLASS}>
           <div className={`${MODAL_PANEL_CLASS} sm:max-w-md p-5 sm:p-6`}>
-            <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-5">
+            <h2 className="text-xl font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] mb-5">
               {modal.type === 'create-monitor' && t('admin_dashboard.create_monitor')}
               {modal.type === 'edit-monitor' && t('admin_dashboard.edit_monitor')}
               {modal.type === 'create-channel' && t('admin_dashboard.create_channel')}

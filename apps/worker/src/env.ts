@@ -43,6 +43,13 @@ export interface Env {
   UPTIMER_INTERNAL_CHECK_BATCH_TRUST_SCHEDULER_LEASE?: string;
   UPTIMER_SCHEDULED_REFRESH_LOGS?: string;
 
+  // SSL certificate expiry monitoring (Cron-driven scan).
+  UPTIMER_SSL_CHECK_ENABLED?: string;
+  UPTIMER_SSL_CHECK_INTERVAL_SECONDS?: string;
+  UPTIMER_SSL_SCAN_BATCH_SIZE?: string;
+  UPTIMER_SSL_CHECK_TIMEOUT_MS?: string;
+  UPTIMER_SSL_NOTIFY_COOLDOWN_SECONDS?: string;
+
   // In-memory, per-instance rate limit for admin endpoints.
   // Keep optional so older deployments don't break.
   ADMIN_RATE_LIMIT_MAX?: string;

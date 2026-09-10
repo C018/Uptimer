@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
 import type {
+  BarkChannelConfig,
+  BarkLevel,
   CreateNotificationChannelInput,
   CustomWebhookChannelConfig,
   NotificationChannel,
@@ -15,8 +17,9 @@ import {
   FIELD_LABEL_CLASS,
   INPUT_CLASS,
   SELECT_CLASS,
+  SegmentedControl,
+  Switch,
   TEXTAREA_CLASS,
-  cn,
 } from './ui';
 
 interface NotificationChannelFormProps {
@@ -37,6 +40,7 @@ type WebhookMethod = NonNullable<CustomWebhookChannelConfig['method']>;
 type WebhookPayloadType = NonNullable<CustomWebhookChannelConfig['payload_type']>;
 type TelegramParseModeInput = '' | TelegramParseMode;
 type TelegramTokenMode = 'token' | 'secret_ref';
+type BarkKeyMode = 'key' | 'secret_ref';
 
 function safeJsonStringify(value: unknown): string {
   try {
@@ -68,8 +72,37 @@ function hasAdvancedTelegramConfig(config: TelegramChannelConfig | undefined): b
   );
 }
 
-function toPreset(value: string): NotificationChannelPreset {
-  return value === 'telegram' ? 'telegram' : 'custom';
+function isBarkConfig(config: WebhookChannelConfig | undefined): config is BarkChannelConfig {
+  return config?.preset === 'bark';
+}
+
+function hasAdvancedBarkConfig(config: BarkChannelConfig | undefined): boolean {
+  if (!config) return false;
+
+  return Boolean(
+    config.device_key_secret_ref ||
+    config.sound ||
+    config.icon ||
+    config.badge !== undefined ||
+    config.is_archive ||
+    config.url ||
+    config.copy ||
+    config.message_template ||
+    (config.enabled_events && config.enabled_events.length > 0) ||
+    config.timeout_ms !== undefined,
+  );
+}
+
+function toBarkLevel(value: string): BarkLevel {
+  switch (value) {
+    case 'active':
+    case 'timeSensitive':
+    case 'passive':
+    case 'critical':
+      return value;
+    default:
+      return 'active';
+  }
 }
 
 function toMethod(value: string): WebhookMethod {
@@ -118,16 +151,19 @@ export function NotificationChannelForm({
   const { t } = useI18n();
   const initialConfig = channel?.config_json;
   const initialIsTelegram = isTelegramConfig(initialConfig);
-  const customConfig = initialIsTelegram
-    ? undefined
-    : (initialConfig as CustomWebhookChannelConfig | undefined);
+  const initialIsBark = isBarkConfig(initialConfig);
+  const customConfig =
+    initialIsTelegram || initialIsBark
+      ? undefined
+      : (initialConfig as CustomWebhookChannelConfig | undefined);
   const telegramConfig = initialIsTelegram
     ? (initialConfig as TelegramChannelConfig | undefined)
     : undefined;
+  const barkConfig = initialIsBark ? (initialConfig as BarkChannelConfig | undefined) : undefined;
 
   const [name, setName] = useState(channel?.name ?? '');
   const [preset, setPreset] = useState<NotificationChannelPreset>(
-    initialIsTelegram ? 'telegram' : 'custom',
+    initialIsTelegram ? 'telegram' : initialIsBark ? 'bark' : 'custom',
   );
   const [url, setUrl] = useState(customConfig?.url ?? '');
   const [method, setMethod] = useState<WebhookMethod>(customConfig?.method ?? 'POST');
@@ -183,8 +219,34 @@ export function NotificationChannelForm({
     telegramConfig?.protect_content ?? false,
   );
 
+  const [showAdvancedBark, setShowAdvancedBark] = useState<boolean>(() =>
+    hasAdvancedBarkConfig(barkConfig),
+  );
+  const [barkKeyMode, setBarkKeyMode] = useState<BarkKeyMode>(
+    barkConfig?.device_key_source === 'secret_ref' || barkConfig?.device_key_secret_ref
+      ? 'secret_ref'
+      : 'key',
+  );
+  const [barkDeviceKey, setBarkDeviceKey] = useState('');
+  const [barkDeviceKeySecretRef, setBarkDeviceKeySecretRef] = useState(
+    barkConfig?.device_key_secret_ref ?? 'UPTIMER_BARK_DEVICE_KEY',
+  );
+  const [barkServerUrl, setBarkServerUrl] = useState(
+    barkConfig?.server_url ?? 'https://api.day.app',
+  );
+  const [barkLevel, setBarkLevel] = useState<BarkLevel>(barkConfig?.level ?? 'active');
+  const [barkSound, setBarkSound] = useState(barkConfig?.sound ?? '');
+  const [barkGroup, setBarkGroup] = useState(barkConfig?.group ?? '');
+  const [barkIcon, setBarkIcon] = useState(barkConfig?.icon ?? '');
+  const [barkBadge, setBarkBadge] = useState(
+    barkConfig?.badge !== undefined ? String(barkConfig.badge) : '',
+  );
+  const [barkIsArchive, setBarkIsArchive] = useState<boolean>(barkConfig?.is_archive ?? false);
+  const [barkUrl, setBarkUrl] = useState(barkConfig?.url ?? '');
+  const [barkCopy, setBarkCopy] = useState(barkConfig?.copy ?? '');
+
   const headersParse = useMemo(() => {
-    if (preset === 'telegram') return { ok: true as const, value: {} as Record<string, string> };
+    if (preset !== 'custom') return { ok: true as const, value: {} as Record<string, string> };
 
     const trimmed = headersJson.trim();
     if (!trimmed) return { ok: true as const, value: {} as Record<string, string> };
@@ -216,7 +278,7 @@ export function NotificationChannelForm({
   }, [headersJson, preset, t]);
 
   const payloadTemplateParse = useMemo(() => {
-    if (preset === 'telegram') {
+    if (preset !== 'custom') {
       return { ok: true as const, value: undefined as unknown };
     }
 
@@ -245,10 +307,21 @@ export function NotificationChannelForm({
   const telegramHasUsableToken = telegramUsesSecretRef
     ? telegramBotTokenSecretRef.trim().length > 0
     : telegramBotToken.trim().length > 0 || Boolean(channel && telegramHasStoredToken);
+  const barkHasStoredKey = Boolean(
+    barkConfig?.device_key_configured ||
+    barkConfig?.device_key_secret_ref ||
+    barkConfig?.device_key_source,
+  );
+  const barkUsesSecretRef = barkKeyMode === 'secret_ref';
+  const barkHasUsableKey = barkUsesSecretRef
+    ? barkDeviceKeySecretRef.trim().length > 0
+    : barkDeviceKey.trim().length > 0 || Boolean(channel && barkHasStoredKey);
+
   const canSubmit =
     headersParse.ok &&
     payloadTemplateParse.ok &&
-    (preset !== 'telegram' || (telegramChatId.trim().length > 0 && telegramHasUsableToken));
+    (preset !== 'telegram' || (telegramChatId.trim().length > 0 && telegramHasUsableToken)) &&
+    (preset !== 'bark' || barkHasUsableKey);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -296,6 +369,48 @@ export function NotificationChannelForm({
       return;
     }
 
+    if (preset === 'bark') {
+      const config: BarkChannelConfig = {
+        preset: 'bark',
+        server_url: barkServerUrl.trim() || 'https://api.day.app',
+        level: barkLevel,
+      };
+
+      if (barkUsesSecretRef) {
+        config.device_key_secret_ref = barkDeviceKeySecretRef.trim();
+      } else if (barkDeviceKey.trim()) {
+        config.device_key = barkDeviceKey.trim();
+      }
+
+      if (showAdvancedBark) {
+        if (barkSound.trim()) config.sound = barkSound.trim();
+        if (barkGroup.trim()) config.group = barkGroup.trim();
+        if (barkIcon.trim()) config.icon = barkIcon.trim();
+
+        const parsedBadge = Number(barkBadge);
+        if (barkBadge.trim() && Number.isInteger(parsedBadge) && parsedBadge >= 0) {
+          config.badge = parsedBadge;
+        }
+
+        if (barkIsArchive) config.is_archive = true;
+        if (barkUrl.trim()) config.url = barkUrl.trim();
+        if (barkCopy.trim()) config.copy = barkCopy.trim();
+
+        if (timeoutMs) {
+          config.timeout_ms = timeoutMs;
+        }
+        if (messageTemplate.trim()) {
+          config.message_template = messageTemplate;
+        }
+        if (enabledEvents.length > 0) {
+          config.enabled_events = enabledEvents;
+        }
+      }
+
+      onSubmit({ name, type: 'webhook', config_json: config });
+      return;
+    }
+
     const config: CustomWebhookChannelConfig = {
       preset: 'custom',
       url,
@@ -334,13 +449,14 @@ export function NotificationChannelForm({
   const handlePresetChange = (next: NotificationChannelPreset) => {
     setPreset(next);
     if (!channel && !name.trim()) {
-      setName(next === 'telegram' ? 'Telegram' : 'Webhook');
+      setName(next === 'telegram' ? 'Telegram' : next === 'bark' ? 'Bark' : 'Webhook');
     }
   };
 
   const allEvents: NotificationEventType[] = [
     'monitor.down',
     'monitor.up',
+    'monitor.ssl_expiring',
     'incident.created',
     'incident.updated',
     'incident.resolved',
@@ -351,7 +467,7 @@ export function NotificationChannelForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       {error && (
-        <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 text-sm text-red-700 dark:text-red-300">
+        <div className="p-3 rounded-lg ui-surface-down dark:ui-surface-down text-sm ui-text-down dark:ui-text-down">
           {error}
         </div>
       )}
@@ -368,36 +484,25 @@ export function NotificationChannelForm({
 
       <div>
         <label className={labelClass}>{t('notification_form.preset')}</label>
-        <div className="grid grid-cols-2 gap-1 rounded-lg border border-slate-200 bg-slate-50 p-1 dark:border-slate-700 dark:bg-slate-800/60">
-          {(['custom', 'telegram'] as const).map((item) => {
-            const active = preset === item;
-            return (
-              <button
-                key={item}
-                type="button"
-                onClick={() => handlePresetChange(toPreset(item))}
-                className={cn(
-                  'h-9 rounded-md px-3 text-sm font-medium transition-colors',
-                  active
-                    ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-slate-100'
-                    : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100',
-                )}
-              >
-                {item === 'telegram'
-                  ? t('notification_form.preset_telegram')
-                  : t('notification_form.preset_custom')}
-              </button>
-            );
-          })}
-        </div>
+        <SegmentedControl<NotificationChannelPreset>
+          value={preset}
+          onChange={handlePresetChange}
+          options={[
+            { value: 'custom', label: t('notification_form.preset_custom') },
+            { value: 'telegram', label: t('notification_form.preset_telegram') },
+            { value: 'bark', label: t('notification_form.preset_bark') },
+          ]}
+        />
         <div className={FIELD_HELP_CLASS}>
           {preset === 'telegram'
             ? t('notification_form.preset_telegram_help')
-            : t('notification_form.preset_custom_help')}
+            : preset === 'bark'
+              ? t('notification_form.preset_bark_help')
+              : t('notification_form.preset_custom_help')}
         </div>
       </div>
 
-      {preset === 'custom' ? (
+      {preset === 'custom' && (
         <>
           <div>
             <label className={labelClass}>{t('notification_form.webhook_url')}</label>
@@ -453,14 +558,16 @@ export function NotificationChannelForm({
               placeholder={t('notification_form.headers_placeholder')}
             />
             {!headersParse.ok && (
-              <div className="mt-1 text-xs text-red-600 dark:text-red-400">
+              <div className="mt-1 text-xs ui-text-down dark:ui-text-down">
                 {headersParse.error}
               </div>
             )}
             <div className={FIELD_HELP_CLASS}>{t('notification_form.headers_help')}</div>
           </div>
         </>
-      ) : (
+      )}
+
+      {preset === 'telegram' && (
         <>
           {!telegramUsesSecretRef && (
             <div>
@@ -493,7 +600,7 @@ export function NotificationChannelForm({
             />
           </div>
 
-          <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+          <label className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-primary)]">
             <input
               type="checkbox"
               checked={showAdvancedTelegram}
@@ -503,7 +610,7 @@ export function NotificationChannelForm({
           </label>
 
           {showAdvancedTelegram && (
-            <div className="space-y-4 border-t border-slate-200 dark:border-slate-700 pt-4">
+            <div className="space-y-4 border-t ui-border-hairline dark:border-[var(--color-border)] pt-4">
               <div>
                 <label className={labelClass}>{t('notification_form.telegram_token_source')}</label>
                 <select
@@ -607,7 +714,7 @@ export function NotificationChannelForm({
                   {allEvents.map((ev) => (
                     <label
                       key={ev}
-                      className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300"
+                      className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-primary)]"
                     >
                       <input
                         type="checkbox"
@@ -622,7 +729,7 @@ export function NotificationChannelForm({
               </div>
 
               <div className="space-y-2">
-                <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+                <label className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-primary)]">
                   <input
                     type="checkbox"
                     checked={telegramDisableNotification}
@@ -630,7 +737,7 @@ export function NotificationChannelForm({
                   />
                   <span>{t('notification_form.telegram_disable_notification')}</span>
                 </label>
-                <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+                <label className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-primary)]">
                   <input
                     type="checkbox"
                     checked={telegramProtectContent}
@@ -638,6 +745,231 @@ export function NotificationChannelForm({
                   />
                   <span>{t('notification_form.telegram_protect_content')}</span>
                 </label>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
+      {preset === 'bark' && (
+        <>
+          <div>
+            <label className={labelClass}>{t('notification_form.bark_key_source')}</label>
+            <SegmentedControl<BarkKeyMode>
+              value={barkKeyMode}
+              onChange={setBarkKeyMode}
+              options={[
+                { value: 'key', label: t('notification_form.bark_key_source_encrypted') },
+                { value: 'secret_ref', label: t('notification_form.bark_key_source_secret_ref') },
+              ]}
+            />
+            <div className={FIELD_HELP_CLASS}>{t('notification_form.bark_key_source_help')}</div>
+          </div>
+
+          {barkUsesSecretRef ? (
+            <div>
+              <label className={labelClass}>{t('notification_form.bark_device_key_secret_ref')}</label>
+              <input
+                type="text"
+                value={barkDeviceKeySecretRef}
+                onChange={(e) => setBarkDeviceKeySecretRef(e.target.value)}
+                className={inputClass}
+                placeholder="UPTIMER_BARK_DEVICE_KEY"
+                required
+              />
+              <div className={FIELD_HELP_CLASS}>
+                {t('notification_form.bark_device_key_secret_ref_help')}
+              </div>
+            </div>
+          ) : (
+            <div>
+              <label className={labelClass}>{t('notification_form.bark_device_key')}</label>
+              <input
+                type="password"
+                value={barkDeviceKey}
+                onChange={(e) => setBarkDeviceKey(e.target.value)}
+                className={inputClass}
+                placeholder={t('notification_form.bark_device_key_placeholder')}
+                autoComplete="off"
+              />
+              <div className={FIELD_HELP_CLASS}>
+                {channel && barkHasStoredKey
+                  ? t('notification_form.bark_device_key_keep_help')
+                  : t('notification_form.bark_device_key_help')}
+              </div>
+            </div>
+          )}
+
+          <div>
+            <label className={labelClass}>{t('notification_form.bark_level')}</label>
+            <SegmentedControl<BarkLevel>
+              value={barkLevel}
+              onChange={setBarkLevel}
+              options={[
+                { value: 'active', label: t('notification_form.bark_level_active') },
+                { value: 'timeSensitive', label: t('notification_form.bark_level_time_sensitive') },
+                { value: 'passive', label: t('notification_form.bark_level_passive') },
+                { value: 'critical', label: t('notification_form.bark_level_critical') },
+              ]}
+            />
+            <div className={FIELD_HELP_CLASS}>{t('notification_form.bark_level_help')}</div>
+          </div>
+
+          <div>
+            <label className={labelClass}>{t('notification_form.bark_server_url')}</label>
+            <input
+              type="url"
+              value={barkServerUrl}
+              onChange={(e) => setBarkServerUrl(e.target.value)}
+              className={inputClass}
+              placeholder="https://api.day.app"
+            />
+            <div className={FIELD_HELP_CLASS}>{t('notification_form.bark_server_url_help')}</div>
+          </div>
+
+          <div className="flex items-center justify-between gap-3 rounded-xl border ui-border-hairline bg-[var(--color-bg)] px-3 py-2.5 dark:border-[var(--color-border)] dark:bg-[var(--color-bg-secondary)]">
+            <span className="text-sm font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-primary)]">
+              {t('notification_form.advanced_options')}
+            </span>
+            <Switch
+              checked={showAdvancedBark}
+              onChange={setShowAdvancedBark}
+              label={t('notification_form.advanced_options')}
+            />
+          </div>
+
+          {showAdvancedBark && (
+            <div className="space-y-4 border-t ui-border-hairline pt-4 dark:border-[var(--color-border)]">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label className={labelClass}>{t('notification_form.bark_sound')}</label>
+                  <input
+                    type="text"
+                    value={barkSound}
+                    onChange={(e) => setBarkSound(e.target.value)}
+                    className={inputClass}
+                    placeholder={t('notification_form.bark_sound_placeholder')}
+                  />
+                </div>
+                <div>
+                  <label className={labelClass}>{t('notification_form.bark_group')}</label>
+                  <input
+                    type="text"
+                    value={barkGroup}
+                    onChange={(e) => setBarkGroup(e.target.value)}
+                    className={inputClass}
+                    placeholder={t('notification_form.bark_group_placeholder')}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label className={labelClass}>{t('notification_form.bark_icon')}</label>
+                  <input
+                    type="url"
+                    value={barkIcon}
+                    onChange={(e) => setBarkIcon(e.target.value)}
+                    className={inputClass}
+                    placeholder="https://example.com/icon.png"
+                  />
+                </div>
+                <div>
+                  <label className={labelClass}>{t('notification_form.bark_badge')}</label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={barkBadge}
+                    onChange={(e) => setBarkBadge(e.target.value)}
+                    className={inputClass}
+                    placeholder={t('notification_form.bark_badge_placeholder')}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className={labelClass}>{t('notification_form.bark_url')}</label>
+                <input
+                  type="url"
+                  value={barkUrl}
+                  onChange={(e) => setBarkUrl(e.target.value)}
+                  className={inputClass}
+                  placeholder={t('notification_form.bark_url_placeholder')}
+                />
+                <div className={FIELD_HELP_CLASS}>{t('notification_form.bark_url_help')}</div>
+              </div>
+
+              <div>
+                <label className={labelClass}>{t('notification_form.bark_copy')}</label>
+                <input
+                  type="text"
+                  value={barkCopy}
+                  onChange={(e) => setBarkCopy(e.target.value)}
+                  className={inputClass}
+                  placeholder={t('notification_form.bark_copy_placeholder')}
+                />
+                <div className={FIELD_HELP_CLASS}>{t('notification_form.bark_copy_help')}</div>
+              </div>
+
+              <label className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-primary)]">
+                <input
+                  type="checkbox"
+                  checked={barkIsArchive}
+                  onChange={(e) => setBarkIsArchive(e.target.checked)}
+                />
+                <span>{t('notification_form.bark_is_archive')}</span>
+              </label>
+
+              <div>
+                <label className={labelClass}>{t('notification_form.timeout_ms')}</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={60000}
+                  value={timeoutMs}
+                  onChange={(e) => setTimeoutMs(Number(e.target.value))}
+                  className={inputClass}
+                />
+              </div>
+
+              <div>
+                <label className={labelClass}>
+                  {t('notification_form.message_template_optional')}
+                </label>
+                <textarea
+                  value={messageTemplate}
+                  onChange={(e) => setMessageTemplate(e.target.value)}
+                  className={textareaClass}
+                  rows={3}
+                  placeholder={t('notification_form.message_template_placeholder')}
+                />
+                <div className={FIELD_HELP_CLASS}>
+                  {t('notification_form.message_template_help')}
+                </div>
+              </div>
+
+              <div>
+                <label className={labelClass}>
+                  {t('notification_form.enabled_events_optional')}
+                </label>
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  {allEvents.map((ev) => (
+                    <label
+                      key={ev}
+                      className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-primary)]"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={enabledEvents.includes(ev)}
+                        onChange={() => toggleEnabledEvent(ev)}
+                      />
+                      <span>{ev}</span>
+                    </label>
+                  ))}
+                </div>
+                <div className={FIELD_HELP_CLASS}>
+                  {t('notification_form.enabled_events_help')}
+                </div>
               </div>
             </div>
           )}
@@ -684,7 +1016,7 @@ export function NotificationChannelForm({
               }
             />
             {!payloadTemplateParse.ok && (
-              <div className="mt-1 text-xs text-red-600 dark:text-red-400">
+              <div className="mt-1 text-xs ui-text-down dark:ui-text-down">
                 {payloadTemplateParse.error}
               </div>
             )}
@@ -697,7 +1029,7 @@ export function NotificationChannelForm({
               {allEvents.map((ev) => (
                 <label
                   key={ev}
-                  className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300"
+                  className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-primary)]"
                 >
                   <input
                     type="checkbox"
@@ -714,8 +1046,8 @@ export function NotificationChannelForm({
       )}
 
       {preset === 'custom' && (
-        <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
-          <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+        <div className="border-t ui-border-hairline dark:border-[var(--color-border)] pt-4">
+          <label className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-primary)]">
             <input
               type="checkbox"
               checked={signingEnabled}

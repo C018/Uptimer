@@ -47,6 +47,8 @@ export const monitors = sqliteTable(
     sortOrder: integer('sort_order').notNull().default(0),
     showOnStatusPage: integer('show_on_status_page', { mode: 'boolean' }).notNull().default(true),
     isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
+    sslCheckEnabled: integer('ssl_check_enabled', { mode: 'boolean' }).notNull().default(false),
+    sslWarnDays: integer('ssl_warn_days').notNull().default(14),
     createdAt: integer('created_at')
       .notNull()
       .default(sql`(CAST(strftime('%s','now') AS INTEGER))`),
@@ -73,6 +75,26 @@ export const monitorState = sqliteTable('monitor_state', {
   lastError: text('last_error'),
   consecutiveFailures: integer('consecutive_failures').notNull().default(0),
   consecutiveSuccesses: integer('consecutive_successes').notNull().default(0),
+});
+
+export type MonitorSslStatus = 'ok' | 'expiring' | 'expired' | 'error';
+
+export const monitorSslState = sqliteTable('monitor_ssl_state', {
+  monitorId: integer('monitor_id').primaryKey(),
+  hostname: text('hostname'),
+  port: integer('port'),
+  status: text('status').$type<MonitorSslStatus>().notNull(),
+  daysRemaining: integer('days_remaining'),
+  validFrom: integer('valid_from'),
+  validTo: integer('valid_to'),
+  issuer: text('issuer'),
+  subject: text('subject'),
+  serialNumber: text('serial_number'),
+  lastError: text('last_error'),
+  checkedAt: integer('checked_at'),
+  lastNotifiedAt: integer('last_notified_at'),
+  lastNotifiedSeverity: text('last_notified_severity'),
+  updatedAt: integer('updated_at').notNull(),
 });
 
 export const checkResults = sqliteTable(

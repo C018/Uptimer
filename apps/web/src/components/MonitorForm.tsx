@@ -4,17 +4,22 @@ import type {
   AdminMonitor,
   CreateMonitorInput,
   HttpResponseMatchMode,
+  MonitorSslState,
+  MonitorSslStatus,
   MonitorType,
   PatchMonitorInput,
   StatusCodeRule,
 } from '../api/types';
+import { checkMonitorSsl } from '../api/client';
 import { useI18n } from '../app/I18nContext';
 import {
+  Badge,
   Button,
   FIELD_HELP_CLASS,
   FIELD_LABEL_CLASS,
   INPUT_CLASS,
   SELECT_CLASS,
+  Switch,
   TEXTAREA_CLASS,
 } from './ui';
 
@@ -42,6 +47,55 @@ const selectClass = SELECT_CLASS;
 const textareaClass = TEXTAREA_CLASS;
 const labelClass = FIELD_LABEL_CLASS;
 type TranslateFn = ReturnType<typeof useI18n>['t'];
+
+function sslBadgeVariant(status: MonitorSslStatus): 'up' | 'down' | 'paused' | 'unknown' {
+  switch (status) {
+    case 'valid':
+      return 'up';
+    case 'expiring':
+      return 'paused';
+    case 'expired':
+    case 'error':
+      return 'down';
+    default:
+      return 'unknown';
+  }
+}
+
+function sslStatusLabel(status: MonitorSslStatus, t: TranslateFn): string {
+  switch (status) {
+    case 'valid':
+      return t('monitor_form.ssl_status_valid');
+    case 'expiring':
+      return t('monitor_form.ssl_status_expiring');
+    case 'expired':
+      return t('monitor_form.ssl_status_expired');
+    case 'error':
+      return t('monitor_form.ssl_status_error');
+    default:
+      return t('monitor_form.ssl_status_unknown');
+  }
+}
+
+/** Solid fill for the certificate lifetime meter (Apple status colours). */
+const sslMeterFill: Record<MonitorSslStatus, string> = {
+  valid: 'bg-[var(--color-up)]',
+  expiring: 'bg-[var(--color-paused)]',
+  expired: 'bg-[var(--color-down)]',
+  error: 'bg-[var(--color-down)]',
+  unknown: 'bg-[var(--color-unknown)]',
+};
+
+/**
+ * Remaining lifetime as a 0–1 ratio. The meter is full when the certificate
+ * still has at least `max(warnDays, 30)` days left, so that the "expiring"
+ * threshold always sits visibly inside the track.
+ */
+function sslMeterRatio(daysRemaining: number | null, warnDays: number): number {
+  if (daysRemaining === null || !Number.isFinite(daysRemaining)) return 0;
+  const span = Math.max(30, warnDays * 2);
+  return Math.max(0, Math.min(1, daysRemaining / span));
+}
 
 function normalizeHttpResponseMatchMode(
   value: HttpResponseMatchMode | null | undefined,
@@ -405,6 +459,26 @@ export function MonitorForm(props: CreateProps | EditProps) {
         : 'contains',
     );
 
+  const [sslCheckEnabled, setSslCheckEnabled] = useState(monitor?.ssl_check_enabled ?? false);
+  const [sslWarnDays, setSslWarnDays] = useState(monitor?.ssl_warn_days ?? 14);
+  const [sslState, setSslState] = useState<MonitorSslState | null>(monitor?.ssl ?? null);
+  const [sslChecking, setSslChecking] = useState(false);
+  const [sslCheckError, setSslCheckError] = useState<string | null>(null);
+
+  const handleCheckSslNow = async () => {
+    if (!monitor) return;
+    setSslChecking(true);
+    setSslCheckError(null);
+    try {
+      const result = await checkMonitorSsl(monitor.id);
+      setSslState({ ...result.ssl, last_error: result.ssl.error });
+    } catch (err) {
+      setSslCheckError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setSslChecking(false);
+    }
+  };
+
   const headersParse = useMemo(() => parseHeadersJson(httpHeadersJson, t), [httpHeadersJson, t]);
   const displayUrlParse = useMemo(
     () => parseOptionalDisplayUrlInput(displayUrl, t),
@@ -457,6 +531,8 @@ export function MonitorForm(props: CreateProps | EditProps) {
       interval_sec: intervalSec,
       timeout_ms: timeoutMs,
       display_url: displayUrlParse.ok ? displayUrlParse.value : null,
+      ssl_check_enabled: sslCheckEnabled,
+      ssl_warn_days: sslWarnDays,
     };
 
     if (monitor) {
@@ -563,14 +639,14 @@ export function MonitorForm(props: CreateProps | EditProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       {props.error && (
-        <div className="rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 px-3 py-2 text-sm text-red-700 dark:text-red-400">
+        <div className="rounded-lg border ui-border-down dark:ui-border-down ui-surface-down dark:ui-surface-down px-3 py-2 text-sm ui-text-down dark:ui-text-down">
           {props.error}
         </div>
       )}
       <div>
         <div className="mb-1 flex items-center justify-between gap-2">
           <label className={labelClass}>{t('monitor_form.name')}</label>
-          <span className="text-[11px] text-slate-400 dark:text-slate-500">
+          <span className="text-[11px] text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
             {monitor
               ? t('monitor_form.id_inline_edit', { id: `#${monitor.id}` })
               : t('monitor_form.id_inline_create')}
@@ -636,8 +712,8 @@ export function MonitorForm(props: CreateProps | EditProps) {
         </div>
       </div>
 
-      <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4 dark:border-slate-700 dark:bg-slate-800/40">
-        <label className="flex items-start gap-3 text-sm text-slate-700 dark:text-slate-300">
+      <div className="rounded-xl border ui-border-hairline bg-[var(--color-bg)] p-4 dark:border-[var(--color-border)] dark:bg-[var(--color-bg-secondary)]">
+        <label className="flex items-start gap-3 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-primary)]">
           <input
             type="checkbox"
             checked={showOnStatusPage}
@@ -645,7 +721,7 @@ export function MonitorForm(props: CreateProps | EditProps) {
             className="mt-1"
           />
           <span>
-            <span className="font-medium text-slate-900 dark:text-slate-100">
+            <span className="font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
               {t('monitor_form.show_on_status_page')}
             </span>
             <span className={`mt-1 block ${FIELD_HELP_CLASS}`}>
@@ -696,7 +772,7 @@ export function MonitorForm(props: CreateProps | EditProps) {
           className={inputClass}
         />
         {!displayUrlParse.ok && (
-          <div className="mt-1 text-xs text-red-600 dark:text-red-400">{displayUrlParse.error}</div>
+          <div className="mt-1 text-xs ui-text-down dark:ui-text-down">{displayUrlParse.error}</div>
         )}
         <div className={FIELD_HELP_CLASS}>{t('monitor_form.display_url_help')}</div>
       </div>
@@ -743,8 +819,8 @@ export function MonitorForm(props: CreateProps | EditProps) {
       </div>
 
       {type === 'http' && (
-        <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
-          <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+        <div className="border-t ui-border-hairline dark:border-[var(--color-border)] pt-4">
+          <label className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-primary)]">
             <input
               type="checkbox"
               checked={showAdvancedHttp}
@@ -755,7 +831,7 @@ export function MonitorForm(props: CreateProps | EditProps) {
 
           {showAdvancedHttp && (
             <div className="mt-4 space-y-4">
-              <label className="flex items-start gap-3 text-sm text-slate-700 dark:text-slate-300">
+              <label className="flex items-start gap-3 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-primary)]">
                 <input
                   type="checkbox"
                   checked={followRedirects}
@@ -763,7 +839,7 @@ export function MonitorForm(props: CreateProps | EditProps) {
                   className="mt-1"
                 />
                 <span>
-                  <span className="font-medium text-slate-900 dark:text-slate-100">
+                  <span className="font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                     {t('monitor_form.follow_redirects')}
                   </span>
                   <span className={`mt-1 block ${FIELD_HELP_CLASS}`}>
@@ -782,7 +858,7 @@ export function MonitorForm(props: CreateProps | EditProps) {
                   placeholder={t('monitor_form.headers_placeholder')}
                 />
                 {!headersParse.ok && (
-                  <div className="mt-1 text-xs text-red-600 dark:text-red-400">
+                  <div className="mt-1 text-xs ui-text-down dark:ui-text-down">
                     {headersParse.error}
                   </div>
                 )}
@@ -799,7 +875,7 @@ export function MonitorForm(props: CreateProps | EditProps) {
                   placeholder={t('monitor_form.expected_status_placeholder')}
                 />
                 {!expectedStatusParse.ok && (
-                  <div className="mt-1 text-xs text-red-600 dark:text-red-400">
+                  <div className="mt-1 text-xs ui-text-down dark:ui-text-down">
                     {expectedStatusParse.error}
                   </div>
                 )}
@@ -816,7 +892,7 @@ export function MonitorForm(props: CreateProps | EditProps) {
                   placeholder={t('monitor_form.forbidden_status_placeholder')}
                 />
                 {!forbiddenStatusParse.ok && (
-                  <div className="mt-1 text-xs text-red-600 dark:text-red-400">
+                  <div className="mt-1 text-xs ui-text-down dark:ui-text-down">
                     {forbiddenStatusParse.error}
                   </div>
                 )}
@@ -851,7 +927,7 @@ export function MonitorForm(props: CreateProps | EditProps) {
                     placeholder={t('monitor_form.response_must_contain_placeholder')}
                   />
                   {!responseKeywordRegexParse.ok && (
-                    <div className="mt-1 text-xs text-red-600 dark:text-red-400">
+                    <div className="mt-1 text-xs ui-text-down dark:ui-text-down">
                       {responseKeywordRegexParse.error}
                     </div>
                   )}
@@ -887,7 +963,7 @@ export function MonitorForm(props: CreateProps | EditProps) {
                     placeholder={t('monitor_form.response_must_not_contain_placeholder')}
                   />
                   {!responseForbiddenKeywordRegexParse.ok && (
-                    <div className="mt-1 text-xs text-red-600 dark:text-red-400">
+                    <div className="mt-1 text-xs ui-text-down dark:ui-text-down">
                       {responseForbiddenKeywordRegexParse.error}
                     </div>
                   )}
@@ -915,6 +991,115 @@ export function MonitorForm(props: CreateProps | EditProps) {
           )}
         </div>
       )}
+
+      <div className="ui-panel p-4">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <div className="font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+              {t('monitor_form.ssl_section_title')}
+            </div>
+            <div className={`mt-1 ${FIELD_HELP_CLASS}`}>
+              {t('monitor_form.ssl_section_help')}
+            </div>
+          </div>
+          <Switch
+            checked={sslCheckEnabled}
+            onChange={setSslCheckEnabled}
+            label={t('monitor_form.ssl_check_enabled')}
+          />
+        </div>
+
+        {sslCheckEnabled && (
+          <div className="mt-4 border-t ui-border-hairline pt-4 dark:border-[var(--color-border)]">
+            <label className={labelClass}>{t('monitor_form.ssl_warn_days')}</label>
+            <input
+              type="number"
+              min={1}
+              max={365}
+              value={sslWarnDays}
+              onChange={(e) => setSslWarnDays(Number(e.target.value))}
+              className={inputClass}
+            />
+            <div className={FIELD_HELP_CLASS}>{t('monitor_form.ssl_warn_days_help')}</div>
+
+            {monitor && (
+              <div className="mt-4 rounded-apple-md bg-[var(--color-bg-secondary)] p-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge variant={sslBadgeVariant(sslState?.status ?? 'unknown')}>
+                      {sslStatusLabel(sslState?.status ?? 'unknown', t)}
+                    </Badge>
+                    {sslState?.days_remaining != null && (
+                      <span className="text-footnote text-[var(--color-text-secondary)] apple-numeric">
+                        {t('monitor_form.ssl_days_remaining', { days: sslState.days_remaining })}
+                      </span>
+                    )}
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    disabled={sslChecking}
+                    onClick={handleCheckSslNow}
+                  >
+                    {sslChecking
+                      ? t('monitor_form.ssl_checking')
+                      : t('monitor_form.ssl_check_now')}
+                  </Button>
+                </div>
+
+                <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-[var(--color-bg)]">
+                  <div
+                    className={`h-full rounded-full transition-[width] duration-500 ease-apple ${
+                      sslMeterFill[sslState?.status ?? 'unknown']
+                    }`}
+                    style={{ width: `${sslMeterRatio(sslState?.days_remaining ?? null, sslWarnDays) * 100}%` }}
+                  />
+                </div>
+
+                <dl className="mt-3 grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+                  {sslState?.valid_to != null && (
+                    <div className="flex items-baseline justify-between gap-2">
+                      <dt className="text-caption-1 text-[var(--color-text-muted)]">
+                        {t('monitor_form.ssl_valid_to_label')}
+                      </dt>
+                      <dd className="text-footnote text-[var(--color-text-primary)] apple-numeric">
+                        {new Date(sslState.valid_to * 1000).toLocaleDateString()}
+                      </dd>
+                    </div>
+                  )}
+                  {sslState?.hostname && (
+                    <div className="flex items-baseline justify-between gap-2 sm:justify-start">
+                      <dt className="text-caption-1 text-[var(--color-text-muted)]">
+                        {t('monitor_form.ssl_hostname_label')}
+                      </dt>
+                      <dd className="truncate text-footnote text-[var(--color-text-primary)]">
+                        {sslState.hostname}
+                      </dd>
+                    </div>
+                  )}
+                  {sslState?.issuer && (
+                    <div className="flex items-baseline justify-between gap-2 sm:col-span-2 sm:justify-start">
+                      <dt className="text-caption-1 text-[var(--color-text-muted)]">
+                        {t('monitor_form.ssl_issuer_label')}
+                      </dt>
+                      <dd className="truncate text-footnote text-[var(--color-text-primary)]">
+                        {sslState.issuer}
+                      </dd>
+                    </div>
+                  )}
+                </dl>
+
+                {(sslCheckError || sslState?.last_error) && (
+                  <div className="mt-3 rounded-apple border ui-border-down ui-surface-down px-3 py-2 text-caption-1 ui-text-down">
+                    {sslCheckError ?? sslState?.last_error}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
       <div className="flex gap-3 pt-2">
         <Button type="button" variant="secondary" onClick={props.onCancel} className="flex-1">

@@ -55,15 +55,15 @@ export function IncidentForm({
       <div>
         <div className={labelClass}>{t('incident_form.affected_monitors')}</div>
         {monitors.length === 0 ? (
-          <div className="text-sm text-slate-500 dark:text-slate-400">
+          <div className="text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
             {t('incident_form.no_monitors_available')}
           </div>
         ) : (
-          <div className="max-h-40 overflow-y-auto border border-slate-200 dark:border-slate-600 rounded-lg p-3 space-y-2 bg-white dark:bg-slate-700">
+          <div className="max-h-40 overflow-y-auto border ui-border-hairline dark:border-[var(--color-border)] rounded-lg p-3 space-y-2 bg-[var(--color-card)] dark:bg-[var(--color-bg-secondary)]">
             {monitors.map((m) => (
               <label
                 key={m.id}
-                className="flex items-center gap-2.5 text-sm cursor-pointer text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"
+                className="flex items-center gap-2.5 text-sm cursor-pointer text-[var(--color-text-secondary)] dark:text-[var(--color-text-primary)] hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-primary)]"
               >
                 <input
                   type="checkbox"
@@ -75,7 +75,7 @@ export function IncidentForm({
                         : selectedMonitorIds.filter((id) => id !== m.id),
                     )
                   }
-                  className="rounded border-slate-300 dark:border-slate-500 text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-600 focus:ring-slate-500"
+                  className="rounded ui-border-hairline dark:border-[var(--color-border)] text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] bg-[var(--color-card)] dark:bg-[var(--color-bg-secondary)] focus:ring-[var(--color-border)]"
                 />
                 <span>{m.name}</span>
               </label>
@@ -83,7 +83,7 @@ export function IncidentForm({
           </div>
         )}
         {monitors.length > 0 && selectedMonitorIds.length === 0 && (
-          <div className="mt-2 text-sm text-red-500 dark:text-red-400">
+          <div className="mt-2 text-sm ui-text-down dark:ui-text-down">
             {t('incident_form.select_at_least_one')}
           </div>
         )}
@@ -145,7 +145,7 @@ export function IncidentForm({
       {normalized.length > 0 && (
         <div>
           <div className={labelClass}>{t('common.preview')}</div>
-          <div className="border border-slate-200 dark:border-slate-600 rounded-lg p-4 bg-slate-50 dark:bg-slate-700/50">
+          <div className="border ui-border-hairline dark:border-[var(--color-border)] rounded-lg p-4 bg-[var(--color-bg)] dark:bg-[var(--color-bg-secondary)]">
             <Markdown text={normalized} />
           </div>
         </div>

@@ -62,6 +62,9 @@ export const createMonitorInputSchema = z
     sort_order: monitorSortOrderSchema.optional(),
     show_on_status_page: z.boolean().optional(),
     is_active: z.boolean().optional(),
+
+    ssl_check_enabled: z.boolean().optional(),
+    ssl_warn_days: z.number().int().min(0).max(365).optional(),
   })
   .superRefine((val, ctx) => {
     const err =
@@ -130,6 +133,9 @@ export const patchMonitorInputSchema = z
     sort_order: monitorSortOrderSchema.optional(),
     show_on_status_page: z.boolean().optional(),
     is_active: z.boolean().optional(),
+
+    ssl_check_enabled: z.boolean().optional(),
+    ssl_warn_days: z.number().int().min(0).max(365).optional(),
   })
   .superRefine((val, ctx) => {
     for (const issue of validateHttpResponseAssertionConfig({

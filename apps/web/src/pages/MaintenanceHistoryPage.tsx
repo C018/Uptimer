@@ -57,13 +57,13 @@ export function MaintenanceHistoryPage() {
   const isInitialLoading = query.isLoading && all.length === 0;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
-      <header className="bg-white dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
+    <div className="min-h-screen bg-[var(--color-bg)] dark:bg-[var(--color-bg-secondary)]">
+      <header className="bg-[var(--color-card)] dark:bg-[var(--color-bg-secondary)] border-b ui-border-hairline dark:border-[var(--color-border)]">
         <div className="mx-auto max-w-[88rem] px-4 py-3 sm:px-6 sm:py-4 lg:px-8 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <Link
               to="/"
-              className="flex items-center justify-center w-9 h-9 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="flex items-center justify-center w-9 h-9 rounded-lg text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg)] dark:text-[var(--color-text-muted)] dark:hover:text-[var(--color-text-primary)] dark:hover:bg-[var(--color-bg-secondary)] transition-colors"
               aria-label={t('history.back_aria')}
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -75,7 +75,7 @@ export function MaintenanceHistoryPage() {
                 />
               </svg>
             </Link>
-            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100">
+            <h1 className="text-xl sm:text-2xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
               {t('maintenance_history.title')}
             </h1>
           </div>
@@ -89,13 +89,13 @@ export function MaintenanceHistoryPage() {
             {Array.from({ length: 3 }).map((_, idx) => (
               <div
                 key={idx}
-                className="ui-skeleton h-28 rounded-xl border border-slate-200/70 dark:border-slate-700/70"
+                className="ui-skeleton h-28 rounded-xl border ui-border-hairline dark:border-[var(--color-border)]"
               />
             ))}
           </div>
         ) : query.isError ? (
           <Card className="p-6 text-center">
-            <p className="text-sm text-red-600 dark:text-red-400">
+            <p className="text-sm ui-text-down dark:ui-text-down">
               {formatError(query.error) ?? t('history.failed_load_maintenance')}
             </p>
           </Card>
@@ -105,13 +105,13 @@ export function MaintenanceHistoryPage() {
               {all.map((w) => (
                 <Card key={w.id} className="p-4 sm:p-5">
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4 mb-2">
-                    <h4 className="font-semibold text-slate-900 dark:text-slate-100">{w.title}</h4>
-                    <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                    <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">{w.title}</h4>
+                    <span className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] whitespace-nowrap">
                       {formatDateTime(w.starts_at, timeZone, locale)} –{' '}
                       {formatDateTime(w.ends_at, timeZone, locale)}
                     </span>
                   </div>
-                  <div className="text-sm text-slate-600 dark:text-slate-300 mb-2">
+                  <div className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-primary)] mb-2">
                     {t('common.affected')}:{' '}
                     {w.monitor_ids.map((id) => monitorNames.get(id) ?? `#${id}`).join(', ')}
                   </div>
@@ -134,7 +134,7 @@ export function MaintenanceHistoryPage() {
           </>
         ) : (
           <Card className="p-6 text-center">
-            <p className="text-slate-500 dark:text-slate-400">
+            <p className="text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
               {t('status_page.no_past_maintenance')}
             </p>
           </Card>

@@ -3,6 +3,7 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'rec
 import type { MonitorAnalyticsDayPoint } from '../api/types';
 import { useI18n } from '../app/I18nContext';
 import { useTheme } from '../app/ThemeContext';
+import { chartPalette, unknownFill } from '../theme/applePalette';
 
 interface DailyUptimeChartProps {
   points: MonitorAnalyticsDayPoint[];
@@ -26,15 +27,16 @@ export function DailyUptimeChart({ points, height = 220 }: DailyUptimeChartProps
 
   if (data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-[220px] text-slate-500 dark:text-slate-400">
+      <div className="flex items-center justify-center h-[220px] text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
         {t('common.no_data')}
       </div>
     );
   }
 
-  const axisColor = isDark ? '#64748b' : '#9ca3af';
-  const uptimeColor = isDark ? '#34d399' : '#22c55e';
-  const unknownColor = isDark ? '#64748b' : '#9ca3af';
+  const palette = chartPalette(isDark);
+  const axisColor = palette.axis;
+  const uptimeColor = palette.linePrimary;
+  const unknownColor = unknownFill(isDark);
 
   return (
     <ResponsiveContainer width="100%" height={height}>
@@ -58,10 +60,10 @@ export function DailyUptimeChart({ points, height = 220 }: DailyUptimeChartProps
             name === 'uptime_pct' ? t('uptime.uptime') : t('uptime.unknown'),
           ]}
           contentStyle={{
-            backgroundColor: isDark ? '#1e293b' : '#ffffff',
-            borderColor: isDark ? '#334155' : '#e2e8f0',
+            backgroundColor: palette.tooltipBg,
+            borderColor: palette.tooltipBorder,
             borderRadius: '0.5rem',
-            color: isDark ? '#f1f5f9' : '#0f172a',
+            color: palette.tooltipText,
           }}
         />
         <Line

@@ -147,7 +147,7 @@ export function MonitorCard({
         <div className="min-w-0 flex items-center gap-2.5">
           <StatusDot status={monitor.status} pulse={monitor.status === 'down'} size="sm" />
           <div className="min-w-0">
-            <h3 className="truncate text-base font-semibold leading-tight text-slate-900 dark:text-slate-100">
+            <h3 className="truncate text-base font-semibold leading-tight text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
               {monitor.name}
             </h3>
             {monitor.display_url && (
@@ -156,16 +156,16 @@ export function MonitorCard({
                 target="_blank"
                 rel="noreferrer"
                 onClick={(event) => event.stopPropagation()}
-                className="mt-0.5 block truncate text-xs text-slate-500 underline decoration-slate-300 underline-offset-2 hover:text-slate-900 dark:text-slate-400 dark:decoration-slate-600 dark:hover:text-slate-100"
+                className="mt-0.5 block truncate text-xs text-[var(--color-text-muted)] underline decoration-[var(--color-border)] underline-offset-2 transition-colors duration-200 ease-apple hover:text-[var(--color-text-primary)]"
                 title={monitor.display_url}
               >
                 {monitor.display_url}
               </a>
             )}
-            <div className="mt-0.5 flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+            <div className="mt-0.5 flex items-center gap-1.5 text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
               <span>{monitor.type}</span>
               {monitor.is_stale && (
-                <span className="rounded bg-amber-100 px-1.5 py-px text-[10px] font-semibold text-amber-800 dark:bg-amber-900/50 dark:text-amber-200">
+                <span className="rounded ui-surface-warn px-1.5 py-px text-[10px] font-semibold ui-text-warn dark:ui-surface-warn dark:ui-text-warn">
                   {t('monitor_card.stale')}
                 </span>
               )}
@@ -183,7 +183,7 @@ export function MonitorCard({
               {formatPct(uptime30d.uptime_pct)}
             </span>
           ) : (
-            <span className="text-xs text-slate-400 dark:text-slate-500">-</span>
+            <span className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">-</span>
           )}
           <Badge variant={monitor.status}>{statusLabel(monitor.status, t)}</Badge>
         </div>
@@ -191,7 +191,7 @@ export function MonitorCard({
 
       {/* Availability (60d) */}
       <div>
-        <div className="mb-2 text-[11px] text-slate-400 dark:text-slate-500">
+        <div className="mb-2 text-[11px] text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
           {t('monitor_card.availability_30d')}
         </div>
         <UptimeBar30d
@@ -207,7 +207,7 @@ export function MonitorCard({
 
       {/* Heartbeat */}
       <div className="mt-2">
-        <div className="mb-2 text-[11px] text-slate-400 dark:text-slate-500">
+        <div className="mb-2 text-[11px] text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
           {t('monitor_card.last_checks', { count: HEARTBEAT_BARS })}
         </div>
         <HeartbeatBar
@@ -219,22 +219,22 @@ export function MonitorCard({
       </div>
 
       {/* Latency + timestamp footer */}
-      <div className="mt-2 sm:mt-2.5 flex flex-wrap items-baseline justify-between gap-y-1 text-xs text-slate-500 dark:text-slate-400">
+      <div className="mt-2 sm:mt-2.5 flex flex-wrap items-baseline justify-between gap-y-1 text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
         <div className="flex items-baseline gap-2 sm:gap-3 tabular-nums">
           <span>
-            <span className="text-slate-400 dark:text-slate-500">{t('monitor_card.fast')}</span>{' '}
+            <span className="text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">{t('monitor_card.fast')}</span>{' '}
             {formatLatency(latencyStats.fastestMs)}
           </span>
           <span>
-            <span className="text-slate-400 dark:text-slate-500">{t('monitor_card.avg')}</span>{' '}
+            <span className="text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">{t('monitor_card.avg')}</span>{' '}
             {formatLatency(latencyStats.avgMs)}
           </span>
           <span>
-            <span className="text-slate-400 dark:text-slate-500">{t('monitor_card.slow')}</span>{' '}
+            <span className="text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">{t('monitor_card.slow')}</span>{' '}
             {formatLatency(latencyStats.slowestMs)}
           </span>
         </div>
-        <span className="text-[11px] text-slate-400 dark:text-slate-500">
+        <span className="text-[11px] text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
           {monitor.last_checked_at ? checkedAt : t('monitor_card.never_checked')}
         </span>
       </div>

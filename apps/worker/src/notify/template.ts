@@ -158,6 +158,16 @@ export function defaultMessageForEvent(
       const displayUrl = asString(vars, 'monitor.display_url');
       return `Monitor UP: ${name}${displayUrl ? ` (${displayUrl})` : ''}`;
     }
+    case 'monitor.ssl_expiring': {
+      const name = asString(vars, 'monitor.name');
+      const host = asString(vars, 'ssl.hostname') || asString(vars, 'monitor.display_url') || name;
+      const days = asString(vars, 'ssl.days_remaining');
+      const validTo = asString(vars, 'ssl.valid_to');
+      const expired = asString(vars, 'ssl.severity') === 'expired';
+      const headline = expired ? 'SSL certificate EXPIRED' : 'SSL certificate expiring soon';
+      const daysText = days ? ` (${days} ${days === '1' ? 'day' : 'days'} left)` : '';
+      return `${headline}: ${host}${daysText}${validTo ? `\nExpires: ${validTo}` : ''}`;
+    }
     case 'incident.created': {
       const title = asString(vars, 'incident.title');
       const impact = asString(vars, 'incident.impact');
@@ -187,5 +197,31 @@ export function defaultMessageForEvent(
       const ev = asString(vars, 'event');
       return ev ? `Uptimer event: ${ev}` : 'Uptimer notification';
     }
+  }
+}
+
+/** Short push title for channels that need one (e.g. Bark). */
+export function defaultTitleForEvent(eventType: NotificationEventType | string): string {
+  switch (eventType) {
+    case 'monitor.down':
+      return 'Monitor DOWN';
+    case 'monitor.up':
+      return 'Monitor UP';
+    case 'monitor.ssl_expiring':
+      return 'SSL certificate';
+    case 'incident.created':
+      return 'New incident';
+    case 'incident.updated':
+      return 'Incident updated';
+    case 'incident.resolved':
+      return 'Incident resolved';
+    case 'maintenance.started':
+      return 'Maintenance started';
+    case 'maintenance.ended':
+      return 'Maintenance ended';
+    case 'test.ping':
+      return 'Uptimer test';
+    default:
+      return 'Uptimer';
   }
 }
