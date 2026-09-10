@@ -93,18 +93,6 @@ function hasAdvancedBarkConfig(config: BarkChannelConfig | undefined): boolean {
   );
 }
 
-function toBarkLevel(value: string): BarkLevel {
-  switch (value) {
-    case 'active':
-    case 'timeSensitive':
-    case 'passive':
-    case 'critical':
-      return value;
-    default:
-      return 'active';
-  }
-}
-
 function toMethod(value: string): WebhookMethod {
   switch (value) {
     case 'GET':

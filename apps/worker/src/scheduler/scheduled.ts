@@ -33,6 +33,7 @@ import { readSettings } from '../settings';
 import { acquireLease, releaseLease } from './lock';
 import { LeaseLostError, startRenewableLease } from './lease-guard';
 import type { NotifyContext } from './notifications';
+import { launchSslScanPhase } from './ssl-scan-launch';
 
 const LOCK_NAME = 'scheduler:tick';
 const LOCK_LEASE_SECONDS = 135;
@@ -1818,13 +1819,10 @@ export async function runScheduledTick(env: Env, ctx: ExecutionContext): Promise
     });
   // Certificate expiry is scanned from the Cron trigger (never from a probe
   // request path) so a fully offline target can still raise certificate alerts.
-  ctx.waitUntil(
-    import('./ssl-scan')
-      .then(({ runSslScanPhase }) => runSslScanPhase({ env, ctx, now: currentNow() }))
-      .catch((err) => {
-        console.warn('scheduled: ssl scan phase failed', err);
-      }),
-  );
+  // The phase is chained onto work this tick already registers with
+  // `ctx.waitUntil` so the runtime keeps the tick alive without adding an extra
+  // pending-work slot.
+  const queueSslScanPhase = () => launchSslScanPhase({ env, ctx, now: currentNow() });
   const queueHomepageRefresh = (
     runtimeUpdates?: MonitorRuntimeUpdate[],
     runtimeSnapshotBaseline?: PublicMonitorRuntimeSnapshot,
@@ -1910,7 +1908,7 @@ export async function runScheduledTick(env: Env, ctx: ExecutionContext): Promise
       console.log('scheduled: idle no runnable monitors');
     }
     await initializeNotifications();
-    ctx.waitUntil(queueHomepageRefresh());
+    ctx.waitUntil(queueHomepageRefresh().then(queueSslScanPhase));
   };
 
   if (!(await hasSchedulableMonitors(env.DB))) {
@@ -1945,7 +1943,7 @@ export async function runScheduledTick(env: Env, ctx: ExecutionContext): Promise
       }
       await initializeNotifications();
       schedulerLease.assertHeld('queueing homepage refresh');
-      ctx.waitUntil(queueHomepageRefresh());
+      ctx.waitUntil(queueHomepageRefresh().then(queueSslScanPhase));
       return;
     }
 
@@ -2177,7 +2175,7 @@ export async function runScheduledTick(env: Env, ctx: ExecutionContext): Promise
       );
     };
 
-    ctx.waitUntil(queuePostCheckRefresh());
+    ctx.waitUntil(queuePostCheckRefresh().then(queueSslScanPhase));
   } catch (err) {
     if (err instanceof LeaseLostError) {
       console.warn(err.message);

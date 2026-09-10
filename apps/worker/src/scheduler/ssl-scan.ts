@@ -7,6 +7,7 @@ import {
 import type { Env } from '../env';
 import { acquireLease, releaseLease } from './lock';
 import { createNotifyContext } from './notifications';
+import { isSslScanEnabled } from './ssl-scan-launch';
 
 /**
  * Scheduled SSL certificate expiry scan.
@@ -126,11 +127,6 @@ function readBoundedPositiveIntegerEnv(
   const parsed = Number.parseInt(raw.trim(), 10);
   if (!Number.isFinite(parsed)) return fallback;
   return Math.max(min, Math.min(max, parsed));
-}
-
-function isSslScanDisabled(env: Env): boolean {
-  const raw = (env as unknown as Record<string, unknown>).UPTIMER_SSL_CHECK_ENABLED;
-  return typeof raw === 'string' && raw.trim() === '0';
 }
 
 function readWarnDays(row: DueSslMonitorRow): number {
@@ -258,7 +254,7 @@ export async function runSslScanPhase(args: {
   const { env, ctx, now } = args;
   const summary: SslScanSummary = { scanned: 0, expiring: 0, expired: 0, errored: 0, notified: 0 };
 
-  if (isSslScanDisabled(env)) return null;
+  if (!isSslScanEnabled(env)) return null;
 
   const intervalSeconds = readBoundedPositiveIntegerEnv(
     env,
@@ -328,7 +324,7 @@ export async function runSslScanPhase(args: {
         notify &&
         severity &&
         outcome.validTo !== null &&
-        shouldNotifySsl(row, severity, now, cooldownSeconds)
+        shouldNotifySsl(row, outcome.status, severity, now, cooldownSeconds)
       ) {
         const eventKey = `monitor:${row.id}:ssl:${severity}:${now}`;
         const payload = {
