@@ -438,8 +438,8 @@ export async function probeTlsCertificate(opts: {
     writer = socket.writable.getWriter();
     await Promise.race([writer.write(clientHello), timeout]);
 
-    let recordBuffer = new Uint8Array(0);
-    let handshakeBuffer = new Uint8Array(0);
+    let recordBuffer: Uint8Array<ArrayBufferLike> = new Uint8Array(0);
+    let handshakeBuffer: Uint8Array<ArrayBufferLike> = new Uint8Array(0);
 
     for (;;) {
       const read = await Promise.race([reader.read(), timeout]);

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { barkChannelConfigSchema, customWebhookChannelConfigSchema } from '@uptimer/db';
+import { barkChannelBaseConfigSchema, customWebhookChannelConfigSchema } from '@uptimer/db';
 
 const workerSecretRefSchema = z
   .string()
@@ -90,15 +90,15 @@ const barkChannelBaseInputSchema = z.object({
   preset: z.literal('bark'),
   device_key: z.string().trim().min(1).max(512).optional(),
   device_key_secret_ref: workerSecretRefSchema.optional(),
-  server_url: barkChannelConfigSchema.shape.server_url,
-  level: barkChannelConfigSchema.shape.level,
-  sound: barkChannelConfigSchema.shape.sound,
-  group: barkChannelConfigSchema.shape.group,
-  icon: barkChannelConfigSchema.shape.icon,
-  badge: barkChannelConfigSchema.shape.badge,
-  is_archive: barkChannelConfigSchema.shape.is_archive,
-  url: barkChannelConfigSchema.shape.url,
-  copy: barkChannelConfigSchema.shape.copy,
+  server_url: barkChannelBaseConfigSchema.shape.server_url,
+  level: barkChannelBaseConfigSchema.shape.level,
+  sound: barkChannelBaseConfigSchema.shape.sound,
+  group: barkChannelBaseConfigSchema.shape.group,
+  icon: barkChannelBaseConfigSchema.shape.icon,
+  badge: barkChannelBaseConfigSchema.shape.badge,
+  is_archive: barkChannelBaseConfigSchema.shape.is_archive,
+  url: barkChannelBaseConfigSchema.shape.url,
+  copy: barkChannelBaseConfigSchema.shape.copy,
   timeout_ms: notificationChannelTimeoutMsSchema,
   message_template: notificationMessageTemplateSchema,
   enabled_events: z.array(notificationEventTypeSchema).min(1).optional(),

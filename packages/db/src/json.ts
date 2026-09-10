@@ -266,35 +266,39 @@ export const telegramChannelConfigSchema = z
   });
 export type TelegramChannelConfig = z.infer<typeof telegramChannelConfigSchema>;
 
-export const barkChannelConfigSchema = z
-  .object({
-    preset: z.literal('bark'),
+/**
+ * Base object schema for Bark channels. Kept separate from the refined schema so
+ * consumers can reuse its `shape`; a superRefined ZodEffects schema exposes no `shape`.
+ */
+export const barkChannelBaseConfigSchema = z.object({
+  preset: z.literal('bark'),
 
-    // Device key (Bark "key"), either encrypted at rest or resolved from a Workers secret.
-    device_key_encrypted: z.string().min(1).max(8192).optional(),
-    device_key_secret_ref: workerSecretRefSchema.optional(),
+  // Device key (Bark "key"), either encrypted at rest or resolved from a Workers secret.
+  device_key_encrypted: z.string().min(1).max(8192).optional(),
+  device_key_secret_ref: workerSecretRefSchema.optional(),
 
-    // Self-hosted Bark servers are supported; defaults to the public gateway.
-    server_url: webhookUrlSchema.optional().default('https://api.day.app'),
+  // Self-hosted Bark servers are supported; defaults to the public gateway.
+  server_url: webhookUrlSchema.optional().default('https://api.day.app'),
 
-    level: z.enum(['active', 'timeSensitive', 'passive', 'critical']).optional(),
-    sound: z.string().trim().min(1).max(64).optional(),
-    group: z.string().trim().min(1).max(64).optional(),
-    icon: z.string().url().optional(),
-    badge: z.number().int().min(0).max(9999).optional(),
-    is_archive: z.boolean().optional(),
-    url: z.string().url().optional(),
-    copy: z.string().max(256).optional(),
+  level: z.enum(['active', 'timeSensitive', 'passive', 'critical']).optional(),
+  sound: z.string().trim().min(1).max(64).optional(),
+  group: z.string().trim().min(1).max(64).optional(),
+  icon: z.string().url().optional(),
+  badge: z.number().int().min(0).max(9999).optional(),
+  is_archive: z.boolean().optional(),
+  url: z.string().url().optional(),
+  copy: z.string().max(256).optional(),
 
-    timeout_ms: notificationChannelTimeoutMsSchema,
+  timeout_ms: notificationChannelTimeoutMsSchema,
 
-    // Optional message template used as the Bark notification body.
-    message_template: notificationMessageTemplateSchema,
+  // Optional message template used as the Bark notification body.
+  message_template: notificationMessageTemplateSchema,
 
-    // If omitted, the channel receives all events.
-    enabled_events: z.array(notificationEventTypeSchema).min(1).optional(),
-  })
-  .superRefine((val, ctx) => {
+  // If omitted, the channel receives all events.
+  enabled_events: z.array(notificationEventTypeSchema).min(1).optional(),
+});
+
+export const barkChannelConfigSchema = barkChannelBaseConfigSchema.superRefine((val, ctx) => {
     const hasEncryptedKey =
       typeof val.device_key_encrypted === 'string' && val.device_key_encrypted.trim().length > 0;
     const hasSecretRef =
