@@ -236,8 +236,7 @@ export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement
 
 const buttonVariants = {
   // Filled tint (systemBlue) — the default Apple action.
-  primary:
-    'bg-[var(--color-accent)] text-white hover:brightness-[1.06] active:brightness-95 shadow-sm',
+  primary: 'ui-accent-fill hover:brightness-[1.06] active:brightness-95',
   // Tinted / grey fill — secondary actions.
   secondary:
     'bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] hover:brightness-[1.03] active:brightness-95 shadow-none',

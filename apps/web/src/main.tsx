@@ -195,7 +195,7 @@ ReactDOM.createRoot(rootEl).render(
             <PreloadCleanup />
             <RouterProvider
               router={router}
-              fallbackElement={<div className="min-h-screen bg-[var(--color-bg)] dark:bg-[var(--color-bg-secondary)]" />}
+              fallbackElement={<div className="min-h-screen app-canvas" />}
             />
           </AuthProvider>
         </QueryClientProvider>

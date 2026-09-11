@@ -256,7 +256,7 @@ function Tooltip({
 
   return (
     <div
-      className="fixed z-50 px-3 py-2 text-xs bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-secondary)] text-white rounded-lg shadow-lg pointer-events-none animate-fade-in"
+      className="fixed z-50 px-3 py-2 text-xs ui-accent-fill rounded-lg shadow-lg pointer-events-none animate-fade-in"
       style={{
         left: position.x,
         top: position.y,

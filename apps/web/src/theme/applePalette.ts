@@ -38,10 +38,10 @@ export interface AppleChartPalette {
 export const lightChartPalette: AppleChartPalette = {
   up: '#34C759', // systemGreen
   down: '#FF3B30', // systemRed
-  maintenance: '#007AFF', // systemBlue
+  maintenance: '#0071E3', // systemBlue
   paused: '#FF9500', // systemOrange
   unknown: '#8E8E93', // systemGray
-  accent: '#007AFF', // systemBlue
+  accent: '#0071E3', // systemBlue
 
   tierBest: '#34C759', // ≥ 99.9 %
   tierGood: '#FFCC00', // ≥ 99 %
@@ -49,10 +49,10 @@ export const lightChartPalette: AppleChartPalette = {
   tierPoor: '#FF3B30', // < 95 %
 
   axis: '#8E8E93',
-  grid: '#E5E5EA',
-  tooltipBg: '#FFFFFF',
-  tooltipBorder: '#E5E5EA',
-  tooltipText: '#1C1C1E',
+  grid: 'rgba(16, 32, 58, 0.10)',
+  tooltipBg: 'rgba(255, 255, 255, 0.92)',
+  tooltipBorder: 'rgba(16, 32, 58, 0.12)',
+  tooltipText: '#14213D',
   linePrimary: '#34C759',
   lineSecondary: '#8E8E93',
 };
@@ -71,11 +71,11 @@ export const darkChartPalette: AppleChartPalette = {
   tierFair: '#FF9F0A',
   tierPoor: '#FF453A',
 
-  axis: '#8E8E93',
-  grid: '#38383A',
-  tooltipBg: '#1C1C1E',
-  tooltipBorder: '#38383A',
-  tooltipText: '#F2F2F7',
+  axis: '#9AA3B5',
+  grid: 'rgba(255, 255, 255, 0.13)',
+  tooltipBg: 'rgba(26, 34, 50, 0.94)',
+  tooltipBorder: 'rgba(255, 255, 255, 0.16)',
+  tooltipText: '#F7FAFF',
   linePrimary: '#30D158',
   lineSecondary: '#636366',
 };
@@ -86,5 +86,5 @@ export function chartPalette(isDark: boolean): AppleChartPalette {
 
 /** Muted fill used for "no data" cells in both appearances. */
 export function unknownFill(isDark: boolean): string {
-  return isDark ? '#3A3A3C' : '#D1D1D6';
+  return isDark ? 'rgba(255, 255, 255, 0.24)' : 'rgba(16, 32, 58, 0.2)';
 }

@@ -31,7 +31,7 @@ const AdminLogin = lazy(async () => {
 });
 
 function PageFallback() {
-  return <div className="min-h-screen bg-[var(--color-bg)] dark:bg-[var(--color-bg-secondary)]" />;
+  return <div className="min-h-screen app-canvas" />;
 }
 
 export const router = createBrowserRouter([

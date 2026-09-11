@@ -55,11 +55,11 @@ export function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg)] dark:bg-[var(--color-bg-secondary)] flex items-center justify-center p-4 sm:p-6">
+    <div className="min-h-screen app-canvas flex items-center justify-center p-4 sm:p-6">
       <Card className="w-full max-w-md p-7 sm:p-8">
         <div className="mb-7 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-bg-secondary)] text-white dark:bg-[var(--color-bg)] dark:text-[var(--color-text-primary)]">
-            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="ui-accent-fill mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl">
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"

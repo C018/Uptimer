@@ -907,8 +907,8 @@ export function AdminDashboard() {
   const toUiGroupLabel = (groupLabel: string) => displayGroupLabel(groupLabel, ungroupedLabel);
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg)] dark:bg-[var(--color-bg-secondary)]">
-      <header className="bg-[var(--color-card)] dark:bg-[var(--color-bg-secondary)] border-b ui-border-hairline dark:border-[var(--color-border)]">
+    <div className="min-h-screen app-canvas">
+      <header className="sticky top-0 z-20 apple-nav">
         <div className="mx-auto max-w-[92rem] px-4 py-3 sm:px-6 sm:py-4 lg:px-8 flex justify-between items-center">
           <h1 className="text-xl sm:text-2xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
             {t('admin_dashboard.title')}
@@ -996,7 +996,7 @@ export function AdminDashboard() {
               className={cn(
                 'flex items-center gap-1.5 rounded-lg px-3 py-2 text-base font-medium transition-all sm:gap-2 sm:px-4 whitespace-nowrap',
                 tab === tabItem.key
-                  ? 'bg-[var(--color-bg-secondary)] text-white shadow-sm dark:bg-[var(--color-bg)] dark:text-[var(--color-text-primary)]'
+                  ? 'ui-accent-fill font-semibold'
                   : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] dark:text-[var(--color-text-muted)] dark:hover:text-[var(--color-text-primary)]',
               )}
             >
@@ -1143,7 +1143,7 @@ export function AdminDashboard() {
                         className={cn(
                           'flex w-full items-center justify-between rounded-lg border px-2.5 py-2 text-left text-xs transition-colors',
                           monitorGroupFilter === ALL_GROUPS_FILTER
-                            ? 'border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-white dark:ui-border-hairline dark:bg-[var(--color-bg)] dark:text-[var(--color-text-primary)]'
+                            ? 'ui-accent-fill'
                             : 'ui-border-hairline text-[var(--color-text-secondary)] hover:bg-[var(--color-bg)] dark:border-[var(--color-border)] dark:text-[var(--color-text-primary)] dark:hover:bg-[var(--color-bg-secondary)]',
                         )}
                       >
@@ -1166,7 +1166,7 @@ export function AdminDashboard() {
                               className={cn(
                                 'flex min-w-0 flex-1 items-center justify-between rounded-lg border px-2.5 py-2 text-left text-xs transition-colors',
                                 active
-                                  ? 'border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-white dark:ui-border-hairline dark:bg-[var(--color-bg)] dark:text-[var(--color-text-primary)]'
+                                  ? 'ui-accent-fill'
                                   : 'ui-border-hairline text-[var(--color-text-secondary)] hover:bg-[var(--color-bg)] dark:border-[var(--color-border)] dark:text-[var(--color-text-primary)] dark:hover:bg-[var(--color-bg-secondary)]',
                               )}
                             >

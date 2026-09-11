@@ -315,8 +315,8 @@ function IncidentDetail({
 
 function StatusPageSkeleton() {
   return (
-    <div className="min-h-screen bg-[var(--color-bg)] dark:bg-[var(--color-bg-secondary)]">
-      <header className="sticky top-0 z-20 border-b ui-border-hairline bg-[var(--material-thick)] backdrop-blur dark:border-[var(--color-border)] dark:bg-[var(--color-bg-secondary)]">
+    <div className="min-h-screen app-canvas">
+      <header className="sticky top-0 z-20 apple-nav">
         <div className="mx-auto max-w-5xl px-4 py-3 sm:px-6 sm:py-4 lg:px-8 flex justify-between items-center">
           <div className="ui-skeleton h-6 w-28 rounded" />
           <div className="ui-skeleton h-8 w-20 rounded-full" />
@@ -465,9 +465,9 @@ export function StatusPage() {
 
   if (!homepageQuery.data) {
     return (
-      <div className="min-h-screen bg-[var(--color-bg)] dark:bg-[var(--color-bg-secondary)] flex items-center justify-center">
+      <div className="min-h-screen app-canvas flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-xl font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] mb-2">
+          <h2 className="text-xl font-semibold text-[var(--color-text-primary)] mb-2">
             {t('status_page.unable_to_load_status')}
           </h2>
           <p className="text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">{t('status_page.check_connection')}</p>
@@ -484,9 +484,9 @@ export function StatusPage() {
   const timeZone = derivedTimeZone;
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg)] dark:bg-[var(--color-bg-secondary)]">
+    <div className="min-h-screen app-canvas">
       {/* Header */}
-      <header className="sticky top-0 z-20 border-b ui-border-hairline bg-[var(--material-thick)] backdrop-blur dark:border-[var(--color-border)] dark:bg-[var(--color-bg-secondary)]">
+      <header className="sticky top-0 z-20 apple-nav">
         <div className="mx-auto max-w-5xl px-4 py-3 sm:px-6 sm:py-4 lg:px-8 flex justify-between items-center">
           <Link to="/" className="flex flex-col justify-center min-w-0 min-h-9">
             <span className="text-xl sm:text-2xl font-bold leading-tight text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] truncate">
@@ -506,30 +506,55 @@ export function StatusPage() {
 
       {/* Status Banner */}
       <div>
-        <div className="mx-auto max-w-5xl px-4 pt-7 pb-3 sm:px-6 sm:pt-12 sm:pb-5 lg:px-8 text-center">
-          <div
-            className={`inline-flex items-center justify-center w-9 h-9 sm:w-12 sm:h-12 rounded-full ${bannerConfig.iconBg} text-[var(--color-text-primary)] text-lg sm:text-2xl mb-2 sm:mb-3`}
-          >
-            {bannerConfig.icon}
+        <div className="mx-auto max-w-5xl px-4 pt-8 pb-4 sm:px-6 sm:pt-14 sm:pb-6 lg:px-8">
+          <div className="ui-panel relative overflow-hidden px-5 py-7 text-center sm:px-8 sm:py-10">
+            <div
+              aria-hidden
+              className={`pointer-events-none absolute -top-28 left-1/2 h-56 w-56 -translate-x-1/2 rounded-full opacity-70 blur-3xl ${bannerConfig.iconBg}`}
+            />
+            <div className="relative">
+              <div
+                className={`mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full text-lg font-semibold text-[var(--color-text-primary)] sm:mb-4 sm:h-14 sm:w-14 sm:text-2xl ${bannerConfig.iconBg}`}
+              >
+                {bannerConfig.icon}
+              </div>
+              <h2 className="text-xl font-bold tracking-tight text-[var(--color-text-primary)] sm:text-3xl">
+                {bannerConfig.text}
+              </h2>
+              {data.banner.source === 'incident' && data.banner.incident && (
+                <p className="mt-1.5 text-sm text-[var(--color-text-muted)]">
+                  {t('status_page.incident_prefix', { value: data.banner.incident.title })}
+                </p>
+              )}
+              {data.banner.source === 'maintenance' && data.banner.maintenance_window && (
+                <p className="mt-1.5 text-sm text-[var(--color-text-muted)]">
+                  {t('status_page.maintenance_prefix', {
+                    value: data.banner.maintenance_window.title,
+                  })}
+                </p>
+              )}
+              <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-bg)] px-3 py-1 text-xs text-[var(--color-text-muted)]">
+                  <svg
+                    className="h-3.5 w-3.5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={1.8}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 8v4l3 2m6-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  {t('common.last_updated', {
+                    value: formatDateTime(data.generated_at, timeZone, locale),
+                  })}
+                </span>
+              </div>
+            </div>
           </div>
-          <h2 className="text-lg sm:text-2xl font-bold mb-1 text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
-            {bannerConfig.text}
-          </h2>
-          {data.banner.source === 'incident' && data.banner.incident && (
-            <p className="text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] text-sm px-4">
-              {t('status_page.incident_prefix', { value: data.banner.incident.title })}
-            </p>
-          )}
-          {data.banner.source === 'maintenance' && data.banner.maintenance_window && (
-            <p className="text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] text-sm px-4">
-              {t('status_page.maintenance_prefix', { value: data.banner.maintenance_window.title })}
-            </p>
-          )}
-          <p className="text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] text-xs mt-2">
-            {t('common.last_updated', {
-              value: formatDateTime(data.generated_at, timeZone, locale),
-            })}
-          </p>
         </div>
       </div>
 
@@ -538,7 +563,7 @@ export function StatusPage() {
         {(data.maintenance_windows.active.length > 0 ||
           data.maintenance_windows.upcoming.length > 0) && (
           <section className="mb-6 sm:mb-8">
-            <h3 className="text-base sm:text-lg font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] mb-2.5 sm:mb-3 flex items-center gap-2">
+            <h3 className="ui-group-header text-base sm:text-lg font-semibold text-[var(--color-text-primary)] mb-2.5 sm:mb-3 flex items-center gap-2">
               <svg
                 className="w-4 h-4 sm:w-5 sm:h-5 ui-text-accent dark:ui-text-accent"
                 fill="none"
@@ -627,7 +652,7 @@ export function StatusPage() {
         {/* Active Incidents */}
         {activeIncidents.length > 0 && (
           <section className="mb-6 sm:mb-8">
-            <h3 className="text-base sm:text-lg font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] mb-2.5 sm:mb-3 flex items-center gap-2">
+            <h3 className="ui-group-header text-base sm:text-lg font-semibold text-[var(--color-text-primary)] mb-2.5 sm:mb-3 flex items-center gap-2">
               <svg
                 className="w-4 h-4 sm:w-5 sm:h-5 ui-text-warn dark:ui-text-warn"
                 fill="none"
@@ -663,17 +688,17 @@ export function StatusPage() {
 
         {/* Monitors */}
         <section>
-          <h3 className="text-base sm:text-lg font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] mb-2.5 sm:mb-3">
+          <h3 className="ui-group-header text-base sm:text-lg font-semibold text-[var(--color-text-primary)] mb-2.5 sm:mb-3">
             {t('status_page.services')}
           </h3>
           <div className="space-y-5">
             {groupedMonitors.map((group) => (
               <div key={group.name}>
-                <div className="mb-2 flex items-center justify-between">
-                  <h4 className="text-sm font-semibold text-[var(--color-text-secondary)] dark:text-[var(--color-text-primary)]">
+                <div className="mb-2 flex items-center justify-between border-b border-[var(--color-border-light)] pb-1.5">
+                  <h4 className="text-sm font-semibold text-[var(--color-text-secondary)]">
                     {group.name}
                   </h4>
-                  <span className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
+                  <span className="apple-numeric text-xs text-[var(--color-text-muted)]">
                     {group.monitors.length}
                   </span>
                 </div>
@@ -777,8 +802,8 @@ export function StatusPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t ui-border-hairline dark:border-[var(--color-border)] bg-[var(--color-card)] dark:bg-[var(--color-bg-secondary)]">
-        <div className="mx-auto max-w-5xl px-4 py-3 text-center text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] sm:px-6 sm:py-4 lg:px-8">
+      <footer className="mt-8 border-t border-[var(--color-border)]">
+        <div className="mx-auto max-w-5xl px-4 py-4 text-center text-sm text-[var(--color-text-muted)] sm:px-6 sm:py-5 lg:px-8">
           {t('status_page.powered_by', { value: siteTitle })}
         </div>
       </footer>
@@ -812,7 +837,7 @@ export function StatusPage() {
 
       {selectedDay && outagesQuery.isLoading && (
         <div className="fixed inset-0 flex items-center justify-center pointer-events-none">
-          <div className="bg-[var(--color-bg-secondary)] text-white text-sm px-3 py-2 rounded-lg">
+          <div className="apple-material-thick border ui-border-hairline dark:border-[var(--color-border)] text-[var(--color-text-primary)] text-sm px-3 py-2 rounded-lg shadow-lg">
             {t('status_page.loading_outages')}
           </div>
         </div>
@@ -828,7 +853,7 @@ export function StatusPage() {
 
       {selectedDay && dayContextQuery.isLoading && (
         <div className="fixed inset-0 flex items-center justify-center pointer-events-none">
-          <div className="bg-[var(--color-bg-secondary)] text-white text-sm px-3 py-2 rounded-lg">
+          <div className="apple-material-thick border ui-border-hairline dark:border-[var(--color-border)] text-[var(--color-text-primary)] text-sm px-3 py-2 rounded-lg shadow-lg">
             {t('status_page.loading_context')}
           </div>
         </div>

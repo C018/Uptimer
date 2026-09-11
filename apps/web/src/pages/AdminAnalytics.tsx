@@ -55,7 +55,7 @@ function RangeTabs<T extends string>({
           className={cn(
             'rounded-md px-2.5 py-1.5 text-sm font-medium transition-colors sm:px-3',
             current === value
-              ? 'bg-[var(--color-bg-secondary)] text-white dark:bg-[var(--color-bg)] dark:text-[var(--color-text-primary)]'
+              ? 'ui-accent-fill font-semibold'
               : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] dark:text-[var(--color-text-muted)] dark:hover:text-[var(--color-text-primary)]',
           )}
         >
@@ -180,8 +180,8 @@ export function AdminAnalytics() {
   const outages = outagesQuery.data?.pages.flatMap((page) => page.outages) ?? [];
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg)] dark:bg-[var(--color-bg-secondary)]">
-      <header className="bg-[var(--color-card)] dark:bg-[var(--color-bg-secondary)] shadow-sm dark:shadow-none dark:border-b dark:border-[var(--color-border)]">
+    <div className="min-h-screen app-canvas">
+      <header className="sticky top-0 z-20 apple-nav">
         <div className="mx-auto max-w-[92rem] px-4 py-3 sm:px-6 sm:py-4 lg:px-8 flex justify-between items-center">
           <h1 className="text-xl sm:text-2xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
             {settings?.site_title
