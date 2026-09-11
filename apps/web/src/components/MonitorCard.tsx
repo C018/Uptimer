@@ -4,6 +4,7 @@ import type {
   HomepageHeartbeatStrip,
   HomepageMonitorCard,
   PublicMonitor,
+  PublicSslSummaryEntry,
   UptimeRatingLevel,
 } from '../api/types';
 import { useI18n } from '../app/I18nContext';
@@ -59,6 +60,8 @@ export interface MonitorCardProps {
   timeZone: string;
   onSelect: () => void;
   onDayClick: (dayStartAt: number) => void;
+  /** Optional TLS certificate summary (days remaining) shown as a badge. */
+  ssl?: PublicSslSummaryEntry | null;
 }
 
 function hasHomepageStrips(monitor: MonitorLike): monitor is HomepageMonitorLike {
@@ -121,6 +124,7 @@ export function MonitorCard({
   onSelect,
   onDayClick,
   timeZone,
+  ssl,
 }: MonitorCardProps) {
   const { locale, t } = useI18n();
   const uptime30d = monitor.uptime_30d;
@@ -139,6 +143,38 @@ export function MonitorCard({
   );
 
   const tier = uptime30d ? getUptimeTier(uptime30d.uptime_pct, ratingLevel) : null;
+
+  const sslPill = useMemo(() => {
+    if (!ssl || ssl.status === 'unknown') return null;
+
+    const className =
+      ssl.status === 'expired'
+        ? 'ui-surface-down ui-text-down ui-border-down dark:ui-surface-down dark:ui-text-down dark:ui-border-down'
+        : ssl.status === 'expiring'
+          ? 'ui-surface-warn ui-text-warn ui-border-warn dark:ui-surface-warn dark:ui-text-warn dark:ui-border-warn'
+          : ssl.status === 'error'
+            ? 'ui-surface-neutral ui-text-muted ui-border-hairline'
+            : 'ui-surface-up ui-text-up ui-border-up dark:ui-surface-up dark:ui-text-up dark:ui-border-up';
+
+    const label =
+      ssl.status === 'expired'
+        ? t('monitor_card.ssl_expired')
+        : ssl.status === 'error'
+          ? t('monitor_card.ssl_error')
+          : t('monitor_card.ssl_days', { days: Math.max(0, ssl.days_remaining ?? 0) });
+
+    const title = [
+      t('monitor_card.ssl_title'),
+      ssl.valid_to
+        ? `${t('monitor_form.ssl_valid_to_label')} ${formatTime(ssl.valid_to, { timeZone, locale })}`
+        : null,
+      ssl.issuer,
+    ]
+      .filter((part): part is string => Boolean(part))
+      .join(' · ');
+
+    return { className, label, title };
+  }, [locale, ssl, t, timeZone]);
 
   return (
     <Card hover onClick={onSelect} className="p-3 sm:p-4">
@@ -184,6 +220,14 @@ export function MonitorCard({
             </span>
           ) : (
             <span className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">-</span>
+          )}
+          {sslPill && (
+            <span
+              className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium tabular-nums ${sslPill.className}`}
+              title={sslPill.title}
+            >
+              {sslPill.label}
+            </span>
           )}
           <Badge variant={monitor.status}>{statusLabel(monitor.status, t)}</Badge>
         </div>

@@ -35,6 +35,7 @@ import type {
   MonitorAnalyticsResponse,
   MonitorOutagesResponse,
   PublicHomepageResponse,
+  PublicSslSummaryResponse,
   UptimeResponse,
 } from './types';
 
@@ -293,6 +294,18 @@ export async function fetchHomepage(): Promise<PublicHomepageResponse> {
 
     throw err;
   }
+}
+
+export async function fetchPublicSslSummary(): Promise<PublicSslSummaryResponse> {
+  const url = `${API_BASE}/public/ssl-summary`;
+  const auth = getOptionalPublicAuth();
+  const cached = auth.shouldBypassCache ? null : getCachedPublic<PublicSslSummaryResponse>(url);
+  if (cached) return cached;
+
+  const res = await fetch(url, auth.fetchInit);
+  const data = await handleResponse<PublicSslSummaryResponse>(res);
+  if (!auth.shouldBypassCache) setCachedPublic(url, data);
+  return data;
 }
 
 export async function fetchLatency(

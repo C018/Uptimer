@@ -10,12 +10,14 @@ import {
   fetchPublicDayContext,
   fetchPublicIncidentDetail,
   fetchPublicMonitorOutages,
+  fetchPublicSslSummary,
 } from '../api/client';
 import type {
   Incident,
   IncidentSummary,
   Outage,
   PublicHomepageResponse,
+  PublicSslSummaryEntry,
 } from '../api/types';
 import { DayDowntimeModal } from '../components/DayDowntimeModal';
 import { Markdown } from '../components/Markdown';
@@ -383,6 +385,24 @@ export function StatusPage() {
     },
   });
 
+  // TLS certificate days remaining for the homepage cards; refreshed on a slower
+  // cadence than the homepage snapshot since certificates change slowly.
+  const sslSummaryQuery = useQuery({
+    queryKey: ['public-ssl-summary'],
+    queryFn: fetchPublicSslSummary,
+    staleTime: 300_000,
+    refetchInterval: 300_000,
+    retry: false,
+  });
+
+  const sslByMonitorId = useMemo(() => {
+    const map = new Map<number, PublicSslSummaryEntry>();
+    for (const entry of sslSummaryQuery.data?.monitors ?? []) {
+      map.set(entry.monitor_id, entry);
+    }
+    return map;
+  }, [sslSummaryQuery.data]);
+
   const derivedTitle = homepageQuery.data?.site_title || 'Uptimer';
   const derivedTimeZone = getBrowserTimeZone() || homepageQuery.data?.site_timezone || 'UTC';
 
@@ -709,6 +729,7 @@ export function StatusPage() {
                       monitor={monitor}
                       ratingLevel={data.uptime_rating_level}
                       timeZone={timeZone}
+                      ssl={sslByMonitorId.get(monitor.id) ?? null}
                       onSelect={() => setSelectedMonitorId(monitor.id)}
                       onDayClick={(dayStartAt) =>
                         setSelectedDay({ monitorId: monitor.id, dayStartAt })

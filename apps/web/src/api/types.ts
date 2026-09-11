@@ -124,6 +124,23 @@ export interface PublicMonitor {
   uptime_days: UptimeDay[];
 }
 
+export type PublicSslStatus = 'ok' | 'expiring' | 'expired' | 'error' | 'unknown';
+
+export interface PublicSslSummaryEntry {
+  monitor_id: number;
+  status: PublicSslStatus;
+  days_remaining: number | null;
+  warn_days: number;
+  valid_to: number | null;
+  issuer: string | null;
+  checked_at: number | null;
+}
+
+export interface PublicSslSummaryResponse {
+  generated_at: number;
+  monitors: PublicSslSummaryEntry[];
+}
+
 export interface StatusResponse {
   generated_at: number;
   site_title: string;

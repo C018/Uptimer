@@ -1920,6 +1920,13 @@ publicRoutes.get('/monitors/:id/outages', async (c) => {
     includeHiddenMonitors,
   );
 });
+publicRoutes.get('/ssl-summary', async (c) => {
+  const now = Math.floor(Date.now() / 1000);
+  const { computePublicSslSummary } = await import('../public/ssl-summary');
+  const payload = await computePublicSslSummary(c.env.DB, now);
+  return c.json(payload);
+});
+
 publicRoutes.get('/health', async (c) => {
   // Minimal DB touch to verify the Worker can connect to D1.
   const db = getDb(c.env);
