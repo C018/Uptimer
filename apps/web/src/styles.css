@@ -59,6 +59,11 @@
   --color-text-muted: #74829a;
   --color-input-bg: rgba(255, 255, 255, 0.8);
   --color-input-border: rgba(16, 32, 58, 0.16);
+  /* Opaque surface for the OS-rendered <select> dropdown list — see Controls.
+   * It cannot be translucent: the popup is a separate platform surface that
+   * does not composite with the glass behind the control. */
+  --color-select-option-bg: #ffffff;
+  --color-select-option-text: #14213d;
 
   /* Materials (translucent bars) */
   --material-bar: rgba(255, 255, 255, 0.68);
@@ -132,6 +137,8 @@
   --color-text-muted: #a3afc6;
   --color-input-bg: rgba(255, 255, 255, 0.09);
   --color-input-border: rgba(255, 255, 255, 0.18);
+  --color-select-option-bg: #1c1c1e;
+  --color-select-option-text: #f7faff;
 
   --material-bar: rgba(20, 29, 45, 0.66);
   --material-thick: rgba(22, 31, 48, 0.78);
@@ -559,6 +566,28 @@ a.apple-list-row:hover {
 
 .dark .ui-select {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%2398989D' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+/*
+ * Native <select> dropdown list.
+ *
+ * The expanded list is painted by the OS, not by our page: it ignores the
+ * translucent --color-input-bg and falls back to the platform sheet, while
+ * every <option> inherits the control's label colour. In dark appearance
+ * that is near-white text on a white sheet — unreadable. Pin an opaque
+ * surface and an explicit label colour per appearance so the popup keeps a
+ * correct contrast in both light and dark. `color-scheme` (see
+ * app/ThemeContext.tsx) covers the platform chrome; this rule guarantees the
+ * rows themselves.
+ */
+select option {
+  background-color: var(--color-select-option-bg);
+  color: var(--color-select-option-text);
+}
+
+.dark select option:checked {
+  background-color: var(--color-accent-strong);
+  color: #ffffff;
 }
 
 .ui-label {
