@@ -359,7 +359,9 @@ export interface PublicUptimeOverviewResponse {
 
 // Admin Types
 
-export type MonitorSslStatus = 'valid' | 'expiring' | 'expired' | 'error' | 'unknown';
+// Mirrors the worker/db union (`monitor_ssl_state.status`): a healthy certificate is
+// reported as 'ok', never 'valid'.
+export type MonitorSslStatus = 'ok' | 'expiring' | 'expired' | 'error' | 'unknown';
 
 export interface MonitorSslState {
   status: MonitorSslStatus;

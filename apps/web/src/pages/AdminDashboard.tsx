@@ -1560,7 +1560,7 @@ export function AdminDashboard() {
                                         {m.ssl_check_enabled && m.ssl && (
                                           <Badge
                                             variant={
-                                              m.ssl.status === 'valid'
+                                              m.ssl.status === 'ok'
                                                 ? 'up'
                                                 : m.ssl.status === 'expiring'
                                                   ? 'paused'

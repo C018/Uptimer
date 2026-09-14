@@ -50,7 +50,7 @@ type TranslateFn = ReturnType<typeof useI18n>['t'];
 
 function sslBadgeVariant(status: MonitorSslStatus): 'up' | 'down' | 'paused' | 'unknown' {
   switch (status) {
-    case 'valid':
+    case 'ok':
       return 'up';
     case 'expiring':
       return 'paused';
@@ -64,7 +64,7 @@ function sslBadgeVariant(status: MonitorSslStatus): 'up' | 'down' | 'paused' | '
 
 function sslStatusLabel(status: MonitorSslStatus, t: TranslateFn): string {
   switch (status) {
-    case 'valid':
+    case 'ok':
       return t('monitor_form.ssl_status_valid');
     case 'expiring':
       return t('monitor_form.ssl_status_expiring');
@@ -79,7 +79,7 @@ function sslStatusLabel(status: MonitorSslStatus, t: TranslateFn): string {
 
 /** Solid fill for the certificate lifetime meter (Apple status colours). */
 const sslMeterFill: Record<MonitorSslStatus, string> = {
-  valid: 'bg-[var(--color-up)]',
+  ok: 'bg-[var(--color-up)]',
   expiring: 'bg-[var(--color-paused)]',
   expired: 'bg-[var(--color-down)]',
   error: 'bg-[var(--color-down)]',
