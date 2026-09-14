@@ -26,6 +26,22 @@ function getStoredTheme(): Theme {
   return 'system';
 }
 
+/**
+ * Apply a resolved appearance to the document root.
+ *
+ * `color-scheme` (not the `.dark` class) drives every OS-rendered piece of
+ * the UI — the native `<select>` dropdown list, scrollbars, form-control
+ * internals. The bootstrap script in `index.html` sets it once on load, so
+ * toggling the theme at runtime must update it as well: otherwise the
+ * dropdown stays on the platform's white sheet while our tokens have
+ * already flipped the label to near-white (white-on-white in dark mode).
+ */
+function applyResolvedTheme(resolved: 'light' | 'dark') {
+  const root = document.documentElement;
+  root.style.colorScheme = resolved;
+  root.classList.toggle('dark', resolved === 'dark');
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(getStoredTheme);
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>(() => {
@@ -41,13 +57,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const resolved = theme === 'system' ? getSystemTheme() : theme;
     setResolvedTheme(resolved);
-
-    const root = document.documentElement;
-    if (resolved === 'dark') {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
+    applyResolvedTheme(resolved);
   }, [theme]);
 
   useEffect(() => {
@@ -55,13 +65,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleChange = (e: MediaQueryListEvent) => {
-      setResolvedTheme(e.matches ? 'dark' : 'light');
-      const root = document.documentElement;
-      if (e.matches) {
-        root.classList.add('dark');
-      } else {
-        root.classList.remove('dark');
-      }
+      const resolved = e.matches ? 'dark' : 'light';
+      setResolvedTheme(resolved);
+      applyResolvedTheme(resolved);
     };
 
     mediaQuery.addEventListener('change', handleChange);
