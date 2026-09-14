@@ -293,9 +293,7 @@ export function defaultTitleForEvent(
   eventType: NotificationEventType | string,
   locale: NotificationLocale = DEFAULT_NOTIFICATION_LOCALE,
 ): string {
-  return locale === 'en'
-    ? englishTitleForEvent(eventType)
-    : chineseTitleForEvent(eventType);
+  return locale === 'en' ? englishTitleForEvent(eventType) : chineseTitleForEvent(eventType);
 }
 
 function englishTitleForEvent(eventType: NotificationEventType | string): string {

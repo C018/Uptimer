@@ -63,18 +63,18 @@ Uptimer 的通知系统在监控状态变化或事件创建/更新时发送 Webh
 
 Webhook 渠道的 `config_json` 字段（由 Zod 校验）：
 
-| 字段               | 必填 | 默认值 | 说明                                                                   |
-| ------------------ | ---- | ------ | ---------------------------------------------------------------------- |
-| `url`              | 是   | —      | Webhook URL（仅允许 `http://` 或 `https://`）                          |
-| `method`           | 否   | `POST` | HTTP 方法：`GET`、`POST`、`PUT`、`PATCH`、`DELETE`、`HEAD`             |
-| `headers`          | 否   | —      | 自定义 Headers 对象 `{ "Header-Name": "value" }`。Value 支持模板渲染。 |
-| `timeout_ms`       | 否   | —      | 请求超时（1–60000 ms）                                                 |
-| `payload_type`     | 否   | `json` | `json`、`param` 或 `x-www-form-urlencoded`                             |
-| `message_template` | 否   | —      | `message` 变量的模板                                                   |
+| 字段               | 必填 | 默认值  | 说明                                                                   |
+| ------------------ | ---- | ------- | ---------------------------------------------------------------------- |
+| `url`              | 是   | —       | Webhook URL（仅允许 `http://` 或 `https://`）                          |
+| `method`           | 否   | `POST`  | HTTP 方法：`GET`、`POST`、`PUT`、`PATCH`、`DELETE`、`HEAD`             |
+| `headers`          | 否   | —       | 自定义 Headers 对象 `{ "Header-Name": "value" }`。Value 支持模板渲染。 |
+| `timeout_ms`       | 否   | —       | 请求超时（1–60000 ms）                                                 |
+| `payload_type`     | 否   | `json`  | `json`、`param` 或 `x-www-form-urlencoded`                             |
+| `message_template` | 否   | —       | `message` 变量的模板                                                   |
 | `message_locale`   | 否   | `zh-CN` | 内置标题与正文的语言：`zh-CN` 或 `en`。自定义模板内容按原样发送。      |
-| `payload_template` | 否   | —      | 自定义 Payload 模板（详见下文）                                        |
-| `enabled_events`   | 否   | —      | 事件白名单数组。空 = 全部事件。`test.ping` 始终通过。                  |
-| `signing`          | 否   | —      | `{ enabled: boolean, secret_ref: string }` — HMAC-SHA256 签名          |
+| `payload_template` | 否   | —       | 自定义 Payload 模板（详见下文）                                        |
+| `enabled_events`   | 否   | —       | 事件白名单数组。空 = 全部事件。`test.ping` 始终通过。                  |
+| `signing`          | 否   | —       | `{ enabled: boolean, secret_ref: string }` — HMAC-SHA256 签名          |
 
 ## Payload 模式
 

@@ -241,16 +241,21 @@ describe('notify/template', () => {
     expect(
       defaultMessageForEvent(
         'monitor.ssl_expiring',
-        { ...vars, monitor: { id: 9, name: 'API', target: 'https://api.example.com/health' }, ssl: { severity: 'expired' } },
+        {
+          ...vars,
+          monitor: { id: 9, name: 'API', target: 'https://api.example.com/health' },
+          ssl: { severity: 'expired' },
+        },
         'en',
       ),
     ).toBe('SSL certificate EXPIRED: API');
 
     expect(
-      defaultMessageForEvent(
-        'monitor.ssl_expiring',
-        { ...vars, monitor: { id: 9, name: 'API', target: 'https://api.example.com/health' }, ssl: { severity: 'expired' } },
-      ),
+      defaultMessageForEvent('monitor.ssl_expiring', {
+        ...vars,
+        monitor: { id: 9, name: 'API', target: 'https://api.example.com/health' },
+        ssl: { severity: 'expired' },
+      }),
     ).toBe('SSL 证书已过期：API');
   });
 
