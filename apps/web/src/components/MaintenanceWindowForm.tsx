@@ -97,7 +97,7 @@ export function MaintenanceWindowForm(props: CreateProps | EditProps) {
       <div>
         <div className={labelClass}>{t('maintenance_form.affected_monitors')}</div>
         {monitors.length === 0 ? (
-          <div className="text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
+          <div className="text-sm text-[var(--color-text-muted)]">
             {t('maintenance_form.no_monitors')}
           </div>
         ) : (
@@ -105,7 +105,7 @@ export function MaintenanceWindowForm(props: CreateProps | EditProps) {
             {monitors.map((m) => (
               <label
                 key={m.id}
-                className="flex items-center gap-2.5 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-primary)] cursor-pointer hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-primary)]"
+                className="flex items-center gap-2.5 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-primary)] cursor-pointer hover:text-[var(--color-text-primary)]"
               >
                 <input
                   type="checkbox"
@@ -125,7 +125,7 @@ export function MaintenanceWindowForm(props: CreateProps | EditProps) {
           </div>
         )}
         {monitorsError && (
-          <div className="mt-2 text-sm ui-text-down dark:ui-text-down">{monitorsError}</div>
+          <div className="mt-2 text-sm ui-text-down">{monitorsError}</div>
         )}
       </div>
 
@@ -162,7 +162,7 @@ export function MaintenanceWindowForm(props: CreateProps | EditProps) {
           />
         </div>
       </div>
-      {timeError && <div className="text-sm ui-text-down dark:ui-text-down">{timeError}</div>}
+      {timeError && <div className="text-sm ui-text-down">{timeError}</div>}
 
       <div>
         <label className={labelClass}>{t('maintenance_form.message')}</label>

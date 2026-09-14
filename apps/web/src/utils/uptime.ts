@@ -72,7 +72,7 @@ export function getUptimeBgClasses(tier: UptimeColorTier): string {
       return 'bg-[var(--color-up)]';
     // ≥ 99 % — systemYellow (slight degradation, still healthy)
     case 'lime':
-      return 'bg-[#FFCC00] dark:bg-[#FFD60A]';
+      return 'bg-[var(--chart-tier-good)]';
     // ≥ 95 % — systemOrange (degraded)
     case 'yellow':
     case 'amber':
@@ -92,21 +92,21 @@ export function getUptimeBgClasses(tier: UptimeColorTier): string {
 export function getUptimePillClasses(tier: UptimeColorTier): string {
   switch (tier) {
     case 'emerald':
-      return 'ui-surface-up ui-text-up ui-border-up dark:ui-surface-up dark:ui-text-up dark:ui-border-up';
+      return 'ui-surface-up ui-text-up ui-border-up';
     case 'green':
-      return 'ui-surface-up ui-text-up ui-border-up dark:ui-surface-up dark:ui-text-up dark:ui-border-up';
+      return 'ui-surface-up ui-text-up ui-border-up';
     case 'lime':
-      return 'ui-surface-up ui-text-up ui-border-up dark:ui-surface-up dark:ui-text-up dark:ui-border-up';
+      return 'ui-surface-up ui-text-up ui-border-up';
     case 'yellow':
-      return 'ui-surface-warn ui-text-warn ui-border-warn dark:ui-surface-warn dark:ui-text-warn dark:ui-border-warn';
+      return 'ui-surface-warn ui-text-warn ui-border-warn';
     case 'amber':
-      return 'ui-surface-warn ui-text-warn ui-border-warn dark:ui-surface-warn dark:ui-text-warn dark:ui-border-warn';
+      return 'ui-surface-warn ui-text-warn ui-border-warn';
     case 'orange':
-      return 'ui-surface-warn ui-text-warn ui-border-warn dark:ui-surface-warn dark:ui-text-warn dark:ui-border-warn';
+      return 'ui-surface-warn ui-text-warn ui-border-warn';
     case 'red':
-      return 'ui-surface-down ui-text-down ui-border-down dark:ui-surface-down dark:ui-text-down dark:ui-border-down';
+      return 'ui-surface-down ui-text-down ui-border-down';
     case 'rose':
-      return 'ui-surface-down ui-text-down ui-border-down dark:ui-surface-down dark:ui-text-down dark:ui-border-down';
+      return 'ui-surface-down ui-text-down ui-border-down';
     case 'slate':
     default:
       return 'bg-[var(--color-bg)] text-[var(--color-text-secondary)] ui-border-hairline dark:bg-[var(--color-bg-secondary)] dark:text-[var(--color-text-primary)] dark:border-[var(--color-border)]';

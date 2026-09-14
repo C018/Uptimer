@@ -157,6 +157,18 @@ export const notificationEventTypeSchema = z.enum([
 ]);
 export type NotificationEventType = z.infer<typeof notificationEventTypeSchema>;
 
+/**
+ * Languages the notification renderer can emit.
+ *
+ * `zh-CN` is the default (see {@link DEFAULT_NOTIFICATION_LOCALE}) so a deployment
+ * without explicit configuration pushes Chinese titles/bodies and Chinese probe
+ * error text; `en` keeps the original English wording.
+ */
+export const NOTIFICATION_LOCALES = ['zh-CN', 'en'] as const;
+export const notificationLocaleSchema = z.enum(NOTIFICATION_LOCALES);
+export type NotificationLocale = (typeof NOTIFICATION_LOCALES)[number];
+export const DEFAULT_NOTIFICATION_LOCALE: NotificationLocale = 'zh-CN';
+
 const webhookUrlSchema = z
   .string()
   .url()
@@ -177,6 +189,10 @@ export const customWebhookChannelConfigSchema = z
     headers: z.record(z.string()).optional(),
     timeout_ms: notificationChannelTimeoutMsSchema,
     payload_type: z.enum(['json', 'param', 'x-www-form-urlencoded']).default('json'),
+
+    // Language of the default notification title/body and of the probe error
+    // text rendered into this channel's messages. Absent means zh-CN.
+    message_locale: notificationLocaleSchema.optional(),
 
     // Optional message template used by $MSG / {{message}} in payload templating.
     message_template: notificationMessageTemplateSchema,
@@ -240,6 +256,10 @@ export const telegramChannelConfigSchema = z
     message_thread_id: z.number().int().positive().optional(),
     timeout_ms: notificationChannelTimeoutMsSchema,
 
+    // Language of the default notification title/body and of the probe error
+    // text rendered into this channel's messages. Absent means zh-CN.
+    message_locale: notificationLocaleSchema.optional(),
+
     // Optional message template used as Telegram sendMessage.text.
     message_template: notificationMessageTemplateSchema,
 
@@ -290,6 +310,10 @@ export const barkChannelBaseConfigSchema = z.object({
   copy: z.string().max(256).optional(),
 
   timeout_ms: notificationChannelTimeoutMsSchema,
+
+  // Language of the default notification title/body and of the probe error
+  // text rendered into this channel's messages. Absent means zh-CN.
+  message_locale: notificationLocaleSchema.optional(),
 
   // Optional message template used as the Bark notification body.
   message_template: notificationMessageTemplateSchema,

@@ -71,6 +71,7 @@ Webhook channel `config_json` fields (validated by Zod):
 | `timeout_ms`       | No       | —       | Request timeout (1–60000 ms)                                                           |
 | `payload_type`     | No       | `json`  | `json`, `param`, or `x-www-form-urlencoded`                                            |
 | `message_template` | No       | —       | Template for the `message` variable                                                    |
+| `message_locale`   | No       | `zh-CN` | Language of the built-in title/body: `zh-CN` or `en`. Custom templates are sent as-is.  |
 | `payload_template` | No       | —       | Custom payload template (see below)                                                    |
 | `enabled_events`   | No       | —       | Event whitelist array. Empty = all events. `test.ping` always passes.                  |
 | `signing`          | No       | —       | `{ enabled: boolean, secret_ref: string }` — HMAC-SHA256 signing                       |

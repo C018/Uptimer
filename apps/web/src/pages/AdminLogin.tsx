@@ -68,10 +68,10 @@ export function AdminLogin() {
               />
             </svg>
           </div>
-          <h1 className="text-xl font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+          <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">
             {t('admin_login.title')}
           </h1>
-          <p className="mt-1 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
+          <p className="mt-1 text-sm text-[var(--color-text-muted)]">
             {t('admin_login.subtitle')}
           </p>
         </div>
@@ -105,7 +105,7 @@ export function AdminLogin() {
         <div className="mt-6 text-center">
           <Link
             to="/"
-            className="text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-primary)] transition-colors"
+            className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors"
           >
             {t('admin_login.back_to_status')}
           </Link>

@@ -1,6 +1,10 @@
 import { z } from 'zod';
 
-import { barkChannelBaseConfigSchema, customWebhookChannelConfigSchema } from '@uptimer/db';
+import {
+  barkChannelBaseConfigSchema,
+  customWebhookChannelConfigSchema,
+  notificationLocaleSchema,
+} from '@uptimer/db';
 
 const workerSecretRefSchema = z
   .string()
@@ -38,6 +42,7 @@ const telegramChannelBaseInputSchema = z.object({
   bot_token_secret_ref: workerSecretRefSchema.optional(),
   message_thread_id: z.number().int().positive().optional(),
   timeout_ms: notificationChannelTimeoutMsSchema,
+  message_locale: notificationLocaleSchema.optional(),
   message_template: notificationMessageTemplateSchema,
   enabled_events: z.array(notificationEventTypeSchema).min(1).optional(),
   parse_mode: z.enum(['Markdown', 'MarkdownV2', 'HTML']).optional(),
@@ -100,6 +105,7 @@ const barkChannelBaseInputSchema = z.object({
   url: barkChannelBaseConfigSchema.shape.url,
   copy: barkChannelBaseConfigSchema.shape.copy,
   timeout_ms: notificationChannelTimeoutMsSchema,
+  message_locale: barkChannelBaseConfigSchema.shape.message_locale,
   message_template: notificationMessageTemplateSchema,
   enabled_events: z.array(notificationEventTypeSchema).min(1).optional(),
 });

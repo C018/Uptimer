@@ -37,7 +37,7 @@ export function LatencyChart({ points, height = 200 }: LatencyChartProps) {
 
   if (rawData.length === 0) {
     return (
-      <div className="flex items-center justify-center h-[200px] text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
+      <div className="flex items-center justify-center h-[200px] text-[var(--color-text-muted)]">
         {t('common.no_latency_data')}
       </div>
     );

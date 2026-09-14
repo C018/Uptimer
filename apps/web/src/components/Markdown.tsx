@@ -8,9 +8,9 @@ export function Markdown({ text }: { text: string }) {
   const { t } = useI18n();
 
   return (
-    <div className="markdown-preview text-sm leading-relaxed text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+    <div className="markdown-preview text-sm leading-relaxed text-[var(--color-text-primary)]">
       <Suspense
-        fallback={<div className="text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">{t('common.loading')}</div>}
+        fallback={<div className="text-[var(--color-text-muted)]">{t('common.loading')}</div>}
       >
         <ReactMarkdown>{text}</ReactMarkdown>
       </Suspense>

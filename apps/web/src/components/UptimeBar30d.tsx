@@ -185,7 +185,7 @@ function Tooltip({
           {t('uptime.unknown')}: {formatSec(day.unknown_sec)}
         </div>
       )}
-      <div className="absolute left-1/2 -bottom-1 -translate-x-1/2 w-2 h-2 bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-secondary)] rotate-45" />
+      <div className="absolute left-1/2 -bottom-1 -translate-x-1/2 w-2 h-2 bg-[var(--color-bg-secondary)] rotate-45" />
     </div>
   );
 }

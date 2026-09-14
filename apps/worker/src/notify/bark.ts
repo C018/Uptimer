@@ -1,4 +1,4 @@
-import type { BarkChannelConfig } from '@uptimer/db';
+import { DEFAULT_NOTIFICATION_LOCALE, type BarkChannelConfig } from '@uptimer/db';
 
 import { BARK_DEVICE_KEY_CONTEXT, decryptSecret, encryptSecret } from './secret-box';
 import { defaultMessageForEvent, defaultTitleForEvent, renderStringTemplate } from './template';
@@ -101,7 +101,13 @@ function buildBarkMessage(args: {
       ? (payload as Record<string, unknown>)
       : {};
 
-  const defaultBody = defaultMessageForEvent(eventType, { ...payloadRecord, event: eventKey });
+  const locale = channel.config.message_locale ?? DEFAULT_NOTIFICATION_LOCALE;
+
+  const defaultBody = defaultMessageForEvent(
+    eventType,
+    { ...payloadRecord, event: eventKey },
+    locale,
+  );
   const templateVars: Record<string, unknown> = {
     ...payloadRecord,
     payload: payloadRecord,
@@ -120,7 +126,7 @@ function buildBarkMessage(args: {
   const body = rendered.trim().length > 0 ? rendered.trim() : defaultBody;
 
   return {
-    title: truncate(defaultTitleForEvent(eventType), TITLE_MAX_LENGTH),
+    title: truncate(defaultTitleForEvent(eventType, locale), TITLE_MAX_LENGTH),
     body: truncate(body, BODY_MAX_LENGTH),
   };
 }

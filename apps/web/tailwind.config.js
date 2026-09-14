@@ -240,12 +240,16 @@ export default {
         brand: blueRamp,
 
         // Semantic status colours (state page vocabulary).
+        // Pointed at the CSS tokens instead of a second copy of the hex values,
+        // so `bg-status-up` and `var(--color-up)` can never disagree. Note:
+        // Tailwind cannot apply slash-opacity (`bg-status-up/20`) to a `var()`
+        // colour — use the `ui-surface-*` / `ui-border-*` utilities for tints.
         status: {
-          up: light.green,
-          down: light.red,
-          maintenance: light.blue,
-          paused: light.orange,
-          unknown: light.gray,
+          up: 'var(--color-up)',
+          down: 'var(--color-down)',
+          maintenance: 'var(--color-maintenance)',
+          paused: 'var(--color-paused)',
+          unknown: 'var(--color-unknown)',
         },
 
         // Direct HIG tokens for new markup.

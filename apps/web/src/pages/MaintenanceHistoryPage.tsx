@@ -63,7 +63,7 @@ export function MaintenanceHistoryPage() {
           <div className="flex items-center gap-3">
             <Link
               to="/"
-              className="flex items-center justify-center w-9 h-9 rounded-lg text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg)] dark:text-[var(--color-text-muted)] dark:hover:text-[var(--color-text-primary)] dark:hover:bg-[var(--color-bg-secondary)] transition-colors"
+              className="flex items-center justify-center w-9 h-9 rounded-lg text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg)] dark:hover:bg-[var(--color-bg-secondary)] transition-colors"
               aria-label={t('history.back_aria')}
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -75,7 +75,7 @@ export function MaintenanceHistoryPage() {
                 />
               </svg>
             </Link>
-            <h1 className="text-xl sm:text-2xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+            <h1 className="text-xl sm:text-2xl font-bold text-[var(--color-text-primary)]">
               {t('maintenance_history.title')}
             </h1>
           </div>
@@ -95,7 +95,7 @@ export function MaintenanceHistoryPage() {
           </div>
         ) : query.isError ? (
           <Card className="p-6 text-center">
-            <p className="text-sm ui-text-down dark:ui-text-down">
+            <p className="text-sm ui-text-down">
               {formatError(query.error) ?? t('history.failed_load_maintenance')}
             </p>
           </Card>
@@ -105,8 +105,8 @@ export function MaintenanceHistoryPage() {
               {all.map((w) => (
                 <Card key={w.id} className="p-4 sm:p-5">
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4 mb-2">
-                    <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">{w.title}</h4>
-                    <span className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] whitespace-nowrap">
+                    <h4 className="font-semibold text-[var(--color-text-primary)]">{w.title}</h4>
+                    <span className="text-xs text-[var(--color-text-muted)] whitespace-nowrap">
                       {formatDateTime(w.starts_at, timeZone, locale)} –{' '}
                       {formatDateTime(w.ends_at, timeZone, locale)}
                     </span>
@@ -134,7 +134,7 @@ export function MaintenanceHistoryPage() {
           </>
         ) : (
           <Card className="p-6 text-center">
-            <p className="text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
+            <p className="text-[var(--color-text-muted)]">
               {t('status_page.no_past_maintenance')}
             </p>
           </Card>

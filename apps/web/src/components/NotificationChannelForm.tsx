@@ -6,6 +6,7 @@ import type {
   CustomWebhookChannelConfig,
   NotificationChannel,
   NotificationChannelPreset,
+  NotificationMessageLocale,
   TelegramChannelConfig,
   TelegramParseMode,
   WebhookChannelConfig,
@@ -163,6 +164,9 @@ export function NotificationChannelForm({
 
   const [headersJson, setHeadersJson] = useState(safeJsonStringify(customConfig?.headers ?? {}));
 
+  const [messageLocale, setMessageLocale] = useState<NotificationMessageLocale>(
+    initialConfig?.message_locale ?? 'zh-CN',
+  );
   const [messageTemplate, setMessageTemplate] = useState(initialConfig?.message_template ?? '');
   const [payloadTemplateJson, setPayloadTemplateJson] = useState(
     customConfig?.payload_template !== undefined
@@ -319,6 +323,7 @@ export function NotificationChannelForm({
       const config: TelegramChannelConfig = {
         preset: 'telegram',
         chat_id: telegramChatId.trim(),
+        message_locale: messageLocale,
       };
 
       if (telegramUsesSecretRef) {
@@ -362,6 +367,7 @@ export function NotificationChannelForm({
         preset: 'bark',
         server_url: barkServerUrl.trim() || 'https://api.day.app',
         level: barkLevel,
+        message_locale: messageLocale,
       };
 
       if (barkUsesSecretRef) {
@@ -405,6 +411,7 @@ export function NotificationChannelForm({
       method,
       timeout_ms: timeoutMs,
       payload_type: payloadType,
+      message_locale: messageLocale,
     };
 
     if (headersParse.ok && Object.keys(headersParse.value).length > 0) {
@@ -455,7 +462,7 @@ export function NotificationChannelForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       {error && (
-        <div className="p-3 rounded-lg ui-surface-down dark:ui-surface-down text-sm ui-text-down dark:ui-text-down">
+        <div className="p-3 rounded-lg ui-surface-down text-sm ui-text-down">
           {error}
         </div>
       )}
@@ -488,6 +495,19 @@ export function NotificationChannelForm({
               ? t('notification_form.preset_bark_help')
               : t('notification_form.preset_custom_help')}
         </div>
+      </div>
+
+      <div>
+        <label className={labelClass}>{t('notification_form.message_locale')}</label>
+        <select
+          value={messageLocale}
+          onChange={(e) => setMessageLocale(e.target.value === 'en' ? 'en' : 'zh-CN')}
+          className={selectClass}
+        >
+          <option value="zh-CN">{t('notification_form.message_locale_zh')}</option>
+          <option value="en">{t('notification_form.message_locale_en')}</option>
+        </select>
+        <div className={FIELD_HELP_CLASS}>{t('notification_form.message_locale_help')}</div>
       </div>
 
       {preset === 'custom' && (
@@ -546,7 +566,7 @@ export function NotificationChannelForm({
               placeholder={t('notification_form.headers_placeholder')}
             />
             {!headersParse.ok && (
-              <div className="mt-1 text-xs ui-text-down dark:ui-text-down">
+              <div className="mt-1 text-xs ui-text-down">
                 {headersParse.error}
               </div>
             )}
@@ -1004,7 +1024,7 @@ export function NotificationChannelForm({
               }
             />
             {!payloadTemplateParse.ok && (
-              <div className="mt-1 text-xs ui-text-down dark:ui-text-down">
+              <div className="mt-1 text-xs ui-text-down">
                 {payloadTemplateParse.error}
               </div>
             )}

@@ -1,10 +1,11 @@
 import pLimit from 'p-limit';
 
-import type {
-  BarkChannelConfig,
-  CustomWebhookChannelConfig,
-  TelegramChannelConfig,
-  WebhookChannelConfig,
+import {
+  DEFAULT_NOTIFICATION_LOCALE,
+  type BarkChannelConfig,
+  type CustomWebhookChannelConfig,
+  type TelegramChannelConfig,
+  type WebhookChannelConfig,
 } from '@uptimer/db';
 
 import { dispatchBarkPresetRequest } from './bark';
@@ -140,7 +141,8 @@ function buildTemplateContext(args: {
     timestamp: args.now,
   };
 
-  const defaultMessage = defaultMessageForEvent(args.eventType, baseVars);
+  const locale = args.channel.config.message_locale ?? DEFAULT_NOTIFICATION_LOCALE;
+  const defaultMessage = defaultMessageForEvent(args.eventType, baseVars, locale);
 
   const message = args.channel.config.message_template
     ? renderStringTemplate(args.channel.config.message_template, {

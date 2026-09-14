@@ -141,11 +141,11 @@ function heartbeatFill(status: CheckStatus, palette: AppleChartPalette, isDark: 
 function tooltipDotClass(status: CheckStatus): string {
   switch (status) {
     case 'up':
-      return 'bg-[var(--color-up)] dark:bg-[var(--color-up)]';
+      return 'bg-[var(--color-up)]';
     case 'down':
-      return 'bg-[var(--color-down)] dark:bg-[var(--color-down)]';
+      return 'bg-[var(--color-down)]';
     case 'maintenance':
-      return 'bg-[var(--color-accent)] dark:bg-[var(--color-accent)]';
+      return 'bg-[var(--color-accent)]';
     case 'unknown':
     default:
       return 'bg-[var(--color-unknown)]';
@@ -280,7 +280,7 @@ function Tooltip({
           {t('heartbeat.sample_checks', { count: heartbeat.sample_count })}
         </div>
       )}
-      <div className="absolute left-1/2 -bottom-1 -translate-x-1/2 w-2 h-2 bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-secondary)] rotate-45" />
+      <div className="absolute left-1/2 -bottom-1 -translate-x-1/2 w-2 h-2 bg-[var(--color-bg-secondary)] rotate-45" />
     </div>
   );
 }

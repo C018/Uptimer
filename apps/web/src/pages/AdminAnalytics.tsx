@@ -56,7 +56,7 @@ function RangeTabs<T extends string>({
             'rounded-md px-2.5 py-1.5 text-sm font-medium transition-colors sm:px-3',
             current === value
               ? 'ui-accent-fill font-semibold'
-              : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] dark:text-[var(--color-text-muted)] dark:hover:text-[var(--color-text-primary)]',
+              : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]',
           )}
         >
           {value}
@@ -77,15 +77,15 @@ function StatTile({
 }) {
   return (
     <div className="rounded-xl border ui-border-hairline bg-[var(--material-thick)] p-4 dark:border-[var(--color-border)] dark:bg-[var(--color-bg-secondary)]">
-      <div className="text-sm font-medium uppercase tracking-wide text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
+      <div className="text-sm font-medium uppercase tracking-wide text-[var(--color-text-muted)]">
         {label}
       </div>
       <div
         className={cn(
           'mt-2 text-2xl font-semibold tabular-nums',
           tone === 'danger'
-            ? 'ui-text-down dark:ui-text-down'
-            : 'text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]',
+            ? 'ui-text-down'
+            : 'text-[var(--color-text-primary)]',
         )}
       >
         {value}
@@ -183,7 +183,7 @@ export function AdminAnalytics() {
     <div className="min-h-screen app-canvas">
       <header className="sticky top-0 z-20 apple-nav">
         <div className="mx-auto max-w-[92rem] px-4 py-3 sm:px-6 sm:py-4 lg:px-8 flex justify-between items-center">
-          <h1 className="text-xl sm:text-2xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+          <h1 className="text-xl sm:text-2xl font-bold text-[var(--color-text-primary)]">
             {settings?.site_title
               ? `${settings.site_title} · ${t('admin_analytics.analytics_title')}`
               : t('admin_analytics.analytics_title')}
@@ -193,7 +193,7 @@ export function AdminAnalytics() {
             <ThemeToggle />
             <Link
               to={ADMIN_PATH}
-              className="flex items-center justify-center h-10 text-base text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg)] dark:hover:bg-[var(--color-bg-secondary)] transition-colors px-3 rounded-lg"
+              className="flex items-center justify-center h-10 text-base text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg)] dark:hover:bg-[var(--color-bg-secondary)] transition-colors px-3 rounded-lg"
             >
               <svg
                 className="w-5 h-5 sm:hidden"
@@ -212,7 +212,7 @@ export function AdminAnalytics() {
             </Link>
             <Link
               to="/"
-              className="flex items-center justify-center h-10 text-base text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg)] dark:hover:bg-[var(--color-bg-secondary)] transition-colors px-3 rounded-lg"
+              className="flex items-center justify-center h-10 text-base text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg)] dark:hover:bg-[var(--color-bg-secondary)] transition-colors px-3 rounded-lg"
             >
               <svg
                 className="w-5 h-5 sm:hidden"
@@ -231,7 +231,7 @@ export function AdminAnalytics() {
             </Link>
             <button
               onClick={logout}
-              className="flex items-center justify-center h-10 text-base ui-text-down dark:ui-text-down hover:ui-text-down dark:hover:ui-text-down hover:ui-surface-down dark:hover:ui-surface-down transition-colors px-3 rounded-lg"
+              className="flex items-center justify-center h-10 text-base ui-text-down hover:ui-text-down hover:ui-surface-down transition-colors px-3 rounded-lg"
             >
               <svg
                 className="w-5 h-5 sm:hidden"
@@ -256,10 +256,10 @@ export function AdminAnalytics() {
         <Card className="p-5 sm:p-6">
           <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-lg font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] sm:text-xl">
+              <h2 className="text-lg font-semibold text-[var(--color-text-primary)] sm:text-xl">
                 {t('admin_analytics.overview_title')}
               </h2>
-              <p className="mt-1 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
+              <p className="mt-1 text-sm text-[var(--color-text-muted)]">
                 {t('admin_analytics.overview_desc')}
               </p>
             </div>
@@ -271,7 +271,7 @@ export function AdminAnalytics() {
           </div>
 
           {overviewQuery.isLoading ? (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4">
               {Array.from({ length: 4 }).map((_, idx) => (
                 <div
                   key={idx}
@@ -280,11 +280,11 @@ export function AdminAnalytics() {
               ))}
             </div>
           ) : overviewQuery.isError || !overviewQuery.data ? (
-            <div className="rounded-lg border ui-border-down ui-surface-down px-4 py-3 text-sm ui-text-down dark:ui-border-down dark:ui-surface-down dark:ui-text-down">
+            <div className="rounded-lg border ui-border-down ui-surface-down px-4 py-3 text-sm ui-text-down">
               {t('admin_analytics.failed_overview')}
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4">
               <StatTile
                 label={t('admin_analytics.uptime')}
                 value={formatPct(overviewQuery.data.totals.uptime_pct)}
@@ -318,10 +318,10 @@ export function AdminAnalytics() {
           <div className="mb-5 flex flex-col gap-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] sm:text-xl">
+                <h2 className="text-lg font-semibold text-[var(--color-text-primary)] sm:text-xl">
                   {t('admin_analytics.monitor_title')}
                 </h2>
-                <p className="mt-1 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
+                <p className="mt-1 text-sm text-[var(--color-text-muted)]">
                   {t('admin_analytics.monitor_desc')}
                 </p>
               </div>
@@ -355,7 +355,7 @@ export function AdminAnalytics() {
             </div>
           ) : monitorAnalyticsQuery.isLoading ? (
             <div className="space-y-4">
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
                 {Array.from({ length: 5 }).map((_, idx) => (
                   <div
                     key={idx}
@@ -369,12 +369,12 @@ export function AdminAnalytics() {
               </div>
             </div>
           ) : monitorAnalyticsQuery.isError || !monitorAnalyticsQuery.data ? (
-            <div className="rounded-lg border ui-border-down ui-surface-down px-4 py-3 text-sm ui-text-down dark:ui-border-down dark:ui-surface-down dark:ui-text-down">
+            <div className="rounded-lg border ui-border-down ui-surface-down px-4 py-3 text-sm ui-text-down">
               {t('admin_analytics.failed_monitor')}
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
                 <StatTile
                   label={t('admin_analytics.uptime')}
                   value={formatPct(monitorAnalyticsQuery.data.uptime_pct)}
@@ -408,11 +408,11 @@ export function AdminAnalytics() {
 
               <div className="mt-5 grid gap-4 md:grid-cols-2">
                 <div className="rounded-xl border ui-border-hairline bg-[var(--material-thick)] p-4 dark:border-[var(--color-border)] dark:bg-[var(--color-bg-secondary)]">
-                  <div className="mb-2 text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+                  <div className="mb-2 text-sm font-medium text-[var(--color-text-primary)]">
                     {t('admin_analytics.daily_uptime')}
                   </div>
                   {monitorRange === '24h' ? (
-                    <div className="flex h-[220px] items-center justify-center text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
+                    <div className="flex h-[220px] items-center justify-center text-sm text-[var(--color-text-muted)]">
                       {t('admin_analytics.daily_rollup_hint')}
                     </div>
                   ) : (
@@ -421,7 +421,7 @@ export function AdminAnalytics() {
                 </div>
 
                 <div className="rounded-xl border ui-border-hairline bg-[var(--material-thick)] p-4 dark:border-[var(--color-border)] dark:bg-[var(--color-bg-secondary)]">
-                  <div className="mb-2 text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+                  <div className="mb-2 text-sm font-medium text-[var(--color-text-primary)]">
                     {t('admin_analytics.latency')}
                   </div>
                   {monitorRange === '24h' ? (
@@ -434,27 +434,27 @@ export function AdminAnalytics() {
 
               <div className="mt-5 rounded-xl border ui-border-hairline bg-[var(--material-thick)] p-4 dark:border-[var(--color-border)] dark:bg-[var(--color-bg-secondary)]">
                 <div className="mb-3 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+                  <div className="text-sm font-medium text-[var(--color-text-primary)]">
                     {t('admin_analytics.outages')}
                   </div>
-                  <div className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
+                  <div className="text-xs text-[var(--color-text-muted)]">
                     {selectedMonitor.name} (#{selectedMonitor.id})
                   </div>
                 </div>
 
                 {outagesQuery.isLoading ? (
-                  <div className="text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
+                  <div className="text-sm text-[var(--color-text-muted)]">
                     {t('admin_analytics.loading_outages')}
                   </div>
                 ) : outages.length === 0 ? (
-                  <div className="text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
+                  <div className="text-sm text-[var(--color-text-muted)]">
                     {t('admin_analytics.no_outages')}
                   </div>
                 ) : (
                   <>
                     <div className="overflow-x-auto">
                       <table className="w-full min-w-[540px] text-sm">
-                        <thead className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
+                        <thead className="text-xs text-[var(--color-text-muted)]">
                           <tr>
                             <th className="py-2 pr-4 text-left">
                               {t('admin_analytics.outage_start')}
@@ -473,10 +473,10 @@ export function AdminAnalytics() {
                         <tbody className="divide-y divide-[var(--color-border-light)] dark:divide-[var(--color-border)]">
                           {outages.map((outage) => (
                             <tr key={outage.id}>
-                              <td className="py-2 pr-4 whitespace-nowrap text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+                              <td className="py-2 pr-4 whitespace-nowrap text-[var(--color-text-primary)]">
                                 {formatDateTime(outage.started_at, timeZone, locale)}
                               </td>
-                              <td className="py-2 pr-4 whitespace-nowrap text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+                              <td className="py-2 pr-4 whitespace-nowrap text-[var(--color-text-primary)]">
                                 {outage.ended_at
                                   ? formatDateTime(outage.ended_at, timeZone, locale)
                                   : t('admin_analytics.ongoing')}

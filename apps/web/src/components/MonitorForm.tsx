@@ -639,14 +639,14 @@ export function MonitorForm(props: CreateProps | EditProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       {props.error && (
-        <div className="rounded-lg border ui-border-down dark:ui-border-down ui-surface-down dark:ui-surface-down px-3 py-2 text-sm ui-text-down dark:ui-text-down">
+        <div className="rounded-lg border ui-border-down ui-surface-down px-3 py-2 text-sm ui-text-down">
           {props.error}
         </div>
       )}
       <div>
         <div className="mb-1 flex items-center justify-between gap-2">
           <label className={labelClass}>{t('monitor_form.name')}</label>
-          <span className="text-[11px] text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
+          <span className="text-[11px] text-[var(--color-text-muted)]">
             {monitor
               ? t('monitor_form.id_inline_edit', { id: `#${monitor.id}` })
               : t('monitor_form.id_inline_create')}
@@ -721,7 +721,7 @@ export function MonitorForm(props: CreateProps | EditProps) {
             className="mt-1"
           />
           <span>
-            <span className="font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+            <span className="font-medium text-[var(--color-text-primary)]">
               {t('monitor_form.show_on_status_page')}
             </span>
             <span className={`mt-1 block ${FIELD_HELP_CLASS}`}>
@@ -772,7 +772,7 @@ export function MonitorForm(props: CreateProps | EditProps) {
           className={inputClass}
         />
         {!displayUrlParse.ok && (
-          <div className="mt-1 text-xs ui-text-down dark:ui-text-down">{displayUrlParse.error}</div>
+          <div className="mt-1 text-xs ui-text-down">{displayUrlParse.error}</div>
         )}
         <div className={FIELD_HELP_CLASS}>{t('monitor_form.display_url_help')}</div>
       </div>
@@ -839,7 +839,7 @@ export function MonitorForm(props: CreateProps | EditProps) {
                   className="mt-1"
                 />
                 <span>
-                  <span className="font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+                  <span className="font-medium text-[var(--color-text-primary)]">
                     {t('monitor_form.follow_redirects')}
                   </span>
                   <span className={`mt-1 block ${FIELD_HELP_CLASS}`}>
@@ -858,7 +858,7 @@ export function MonitorForm(props: CreateProps | EditProps) {
                   placeholder={t('monitor_form.headers_placeholder')}
                 />
                 {!headersParse.ok && (
-                  <div className="mt-1 text-xs ui-text-down dark:ui-text-down">
+                  <div className="mt-1 text-xs ui-text-down">
                     {headersParse.error}
                   </div>
                 )}
@@ -875,7 +875,7 @@ export function MonitorForm(props: CreateProps | EditProps) {
                   placeholder={t('monitor_form.expected_status_placeholder')}
                 />
                 {!expectedStatusParse.ok && (
-                  <div className="mt-1 text-xs ui-text-down dark:ui-text-down">
+                  <div className="mt-1 text-xs ui-text-down">
                     {expectedStatusParse.error}
                   </div>
                 )}
@@ -892,7 +892,7 @@ export function MonitorForm(props: CreateProps | EditProps) {
                   placeholder={t('monitor_form.forbidden_status_placeholder')}
                 />
                 {!forbiddenStatusParse.ok && (
-                  <div className="mt-1 text-xs ui-text-down dark:ui-text-down">
+                  <div className="mt-1 text-xs ui-text-down">
                     {forbiddenStatusParse.error}
                   </div>
                 )}
@@ -927,7 +927,7 @@ export function MonitorForm(props: CreateProps | EditProps) {
                     placeholder={t('monitor_form.response_must_contain_placeholder')}
                   />
                   {!responseKeywordRegexParse.ok && (
-                    <div className="mt-1 text-xs ui-text-down dark:ui-text-down">
+                    <div className="mt-1 text-xs ui-text-down">
                       {responseKeywordRegexParse.error}
                     </div>
                   )}
@@ -963,7 +963,7 @@ export function MonitorForm(props: CreateProps | EditProps) {
                     placeholder={t('monitor_form.response_must_not_contain_placeholder')}
                   />
                   {!responseForbiddenKeywordRegexParse.ok && (
-                    <div className="mt-1 text-xs ui-text-down dark:ui-text-down">
+                    <div className="mt-1 text-xs ui-text-down">
                       {responseForbiddenKeywordRegexParse.error}
                     </div>
                   )}
@@ -995,7 +995,7 @@ export function MonitorForm(props: CreateProps | EditProps) {
       <div className="ui-panel p-4">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <div className="font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+            <div className="font-semibold text-[var(--color-text-primary)]">
               {t('monitor_form.ssl_section_title')}
             </div>
             <div className={`mt-1 ${FIELD_HELP_CLASS}`}>

@@ -27,7 +27,7 @@ export function DailyUptimeChart({ points, height = 220 }: DailyUptimeChartProps
 
   if (data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-[220px] text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
+      <div className="flex items-center justify-center h-[220px] text-[var(--color-text-muted)]">
         {t('common.no_data')}
       </div>
     );

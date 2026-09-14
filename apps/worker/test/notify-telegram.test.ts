@@ -109,8 +109,8 @@ describe('notify/webhook Telegram preset', () => {
       parse_mode: 'HTML',
       disable_notification: true,
     });
-    expect(String(requestBody?.text)).toContain('Monitor DOWN: API');
-    expect(String(requestBody?.text)).toContain('Timeout after 10000ms');
+    expect(String(requestBody?.text)).toContain('监控故障：API');
+    expect(String(requestBody?.text)).toContain('请求超时（10000ms）');
     expect(finalizeArgs).toEqual(['success', 200, null, 'monitor:1:down:100', 7]);
   });
 

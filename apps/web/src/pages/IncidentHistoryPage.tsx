@@ -39,7 +39,7 @@ function IncidentCard({
   return (
     <button onClick={onClick} className="ui-panel ui-panel-hover w-full text-left rounded-xl p-5">
       <div className="flex items-start justify-between gap-4 mb-2">
-        <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">{incident.title}</h4>
+        <h4 className="font-semibold text-[var(--color-text-primary)]">{incident.title}</h4>
         <Badge
           variant={
             incident.impact === 'critical' || incident.impact === 'major' ? 'down' : 'paused'
@@ -48,7 +48,7 @@ function IncidentCard({
           {incidentImpactLabel(incident.impact, t)}
         </Badge>
       </div>
-      <div className="flex items-center gap-3 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] mb-3">
+      <div className="flex items-center gap-3 text-sm text-[var(--color-text-muted)] mb-3">
         <Badge variant="info">{incidentStatusLabel(incident.status, t)}</Badge>
         <span>{formatDateTime(incident.started_at, timeZone, locale)}</span>
       </div>
@@ -82,7 +82,7 @@ function IncidentDetail({
       >
         <div className="flex justify-between items-start mb-4 sm:mb-6">
           <div>
-            <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] mb-2">
+            <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-text-primary)] mb-2">
               {incident.title}
             </h2>
             <div className="flex flex-wrap items-center gap-2">
@@ -115,7 +115,7 @@ function IncidentDetail({
 
         <div className="space-y-2 sm:space-y-3 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-primary)] mb-4 sm:mb-6 pb-4 sm:pb-6 border-b ui-border-hairline dark:border-[var(--color-border)]">
           <div className="flex flex-col sm:flex-row sm:gap-2">
-            <span className="text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] sm:w-20 text-xs sm:text-sm">
+            <span className="text-[var(--color-text-muted)] sm:w-20 text-xs sm:text-sm">
               {t('common.affected')}:
             </span>
             <span className="text-sm">
@@ -123,14 +123,14 @@ function IncidentDetail({
             </span>
           </div>
           <div className="flex flex-col sm:flex-row sm:gap-2">
-            <span className="text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] sm:w-20 text-xs sm:text-sm">
+            <span className="text-[var(--color-text-muted)] sm:w-20 text-xs sm:text-sm">
               {t('common.started')}:
             </span>
             <span className="text-sm">{formatDateTime(incident.started_at, timeZone, locale)}</span>
           </div>
           {incident.resolved_at && (
             <div className="flex flex-col sm:flex-row sm:gap-2">
-              <span className="text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] sm:w-20 text-xs sm:text-sm">
+              <span className="text-[var(--color-text-muted)] sm:w-20 text-xs sm:text-sm">
                 {t('common.resolved')}:
               </span>
               <span className="text-sm">
@@ -143,7 +143,7 @@ function IncidentDetail({
         <div className="space-y-4">
           {incident.message && (
             <div className="bg-[var(--color-bg)] dark:bg-[var(--color-bg-secondary)] rounded-lg p-4">
-              <div className="text-xs uppercase tracking-wide text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] mb-2">
+              <div className="text-xs uppercase tracking-wide text-[var(--color-text-muted)] mb-2">
                 {t('status_page.initial_report')}
               </div>
               <Markdown text={incident.message} />
@@ -154,7 +154,7 @@ function IncidentDetail({
             <div key={u.id} className="border-l-2 ui-border-hairline dark:border-[var(--color-border)] pl-4">
               <div className="flex items-center gap-3 mb-2">
                 {u.status && <Badge variant="info">{incidentStatusLabel(u.status, t)}</Badge>}
-                <span className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
+                <span className="text-xs text-[var(--color-text-muted)]">
                   {formatDateTime(u.created_at, timeZone, locale)}
                 </span>
               </div>
@@ -216,7 +216,7 @@ export function IncidentHistoryPage() {
           <div className="flex items-center gap-3">
             <Link
               to="/"
-              className="flex items-center justify-center w-9 h-9 rounded-lg text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg)] dark:text-[var(--color-text-muted)] dark:hover:text-[var(--color-text-primary)] dark:hover:bg-[var(--color-bg-secondary)] transition-colors"
+              className="flex items-center justify-center w-9 h-9 rounded-lg text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg)] dark:hover:bg-[var(--color-bg-secondary)] transition-colors"
               aria-label={t('history.back_aria')}
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -228,7 +228,7 @@ export function IncidentHistoryPage() {
                 />
               </svg>
             </Link>
-            <h1 className="text-xl sm:text-2xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+            <h1 className="text-xl sm:text-2xl font-bold text-[var(--color-text-primary)]">
               {t('incident_history.title')}
             </h1>
           </div>
@@ -248,7 +248,7 @@ export function IncidentHistoryPage() {
           </div>
         ) : query.isError ? (
           <Card className="p-6 text-center">
-            <p className="text-sm ui-text-down dark:ui-text-down">
+            <p className="text-sm ui-text-down">
               {formatError(query.error) ?? t('history.failed_load_incidents')}
             </p>
           </Card>
@@ -279,7 +279,7 @@ export function IncidentHistoryPage() {
           </>
         ) : (
           <Card className="p-6 text-center">
-            <p className="text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
+            <p className="text-[var(--color-text-muted)]">
               {t('status_page.no_past_incidents')}
             </p>
           </Card>

@@ -1,12 +1,15 @@
 /**
  * Apple (HIG) chart palette.
  *
- * Recharts and the inline-SVG widgets cannot consume the CSS custom
- * properties defined in `styles.css` (an SVG data-URI has no access to the
- * page cascade), so the same Apple system colours are mirrored here as plain
- * hex values, in a light and a dark appearance.
+ * Charts (Recharts props, inline SVG, SVG data-URIs) cannot take a
+ * `var(--token)` string, so previously this module mirrored the Apple system
+ * colours as hardcoded hex pairs and relied on a human to keep them in sync
+ * with `styles.css` — which had already drifted (`maintenance`, dark `unknown`).
  *
- * Keep this list in sync with the `--color-*` tokens in `styles.css`.
+ * It now resolves the real design tokens from the document root at runtime
+ * (once per appearance, then cached). The literal palettes below are the
+ * last-resort fallbacks used when there is no DOM (SSR / tests) or when the
+ * stylesheet did not load; they intentionally name the same tokens.
  */
 
 export interface AppleChartPalette {
@@ -34,7 +37,34 @@ export interface AppleChartPalette {
   lineSecondary: string;
 }
 
-/** Light appearance — Apple system colours (light variants). */
+/**
+ * CSS custom property backing each palette entry. Status ramps point at the
+ * shared `--color-*` tokens, so this file no longer holds a second copy of
+ * the status palette.
+ */
+const TOKEN_NAMES: Record<keyof AppleChartPalette, string> = {
+  up: '--color-up',
+  down: '--color-down',
+  maintenance: '--color-maintenance',
+  paused: '--color-paused',
+  unknown: '--color-unknown',
+  accent: '--color-accent',
+  tierBest: '--chart-tier-best',
+  tierGood: '--chart-tier-good',
+  tierFair: '--chart-tier-fair',
+  tierPoor: '--chart-tier-poor',
+  axis: '--chart-axis',
+  grid: '--chart-grid',
+  tooltipBg: '--chart-tooltip-bg',
+  tooltipBorder: '--chart-tooltip-border',
+  tooltipText: '--chart-tooltip-text',
+  linePrimary: '--chart-line-primary',
+  lineSecondary: '--chart-line-secondary',
+};
+
+const UNKNOWN_FILL_TOKEN = '--chart-unknown-fill';
+
+/** Light appearance — fallback values mirroring `:root` in `styles.css`. */
 export const lightChartPalette: AppleChartPalette = {
   up: '#34C759', // systemGreen
   down: '#FF3B30', // systemRed
@@ -57,13 +87,13 @@ export const lightChartPalette: AppleChartPalette = {
   lineSecondary: '#8E8E93',
 };
 
-/** Dark appearance — Apple system colours (dark variants). */
+/** Dark appearance — fallback values mirroring `.dark` in `styles.css`. */
 export const darkChartPalette: AppleChartPalette = {
   up: '#30D158',
   down: '#FF453A',
   maintenance: '#0A84FF',
   paused: '#FF9F0A',
-  unknown: '#8E8E93',
+  unknown: '#98989D', // was #8E8E93 (light gray) — drifted from --color-unknown
   accent: '#0A84FF',
 
   tierBest: '#30D158',
@@ -80,11 +110,56 @@ export const darkChartPalette: AppleChartPalette = {
   lineSecondary: '#636366',
 };
 
+const paletteCache = new Map<boolean, AppleChartPalette>();
+const unknownFillCache = new Map<boolean, string>();
+
+function readRootStyle(): CSSStyleDeclaration | null {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return null;
+  const root = document.documentElement;
+  if (!root) return null;
+  return window.getComputedStyle(root);
+}
+
+function resolvePalette(isDark: boolean): AppleChartPalette {
+  const fallback = isDark ? darkChartPalette : lightChartPalette;
+  const styles = readRootStyle();
+  if (!styles) return fallback;
+
+  const resolved: AppleChartPalette = { ...fallback };
+  (Object.keys(TOKEN_NAMES) as (keyof AppleChartPalette)[]).forEach((key) => {
+    const value = styles.getPropertyValue(TOKEN_NAMES[key]).trim();
+    if (value) resolved[key] = value;
+  });
+  return resolved;
+}
+
+/**
+ * Chart palette for the current appearance, resolved from the CSS tokens the
+ * first time it is requested and then reused (charts call this per series and
+ * per bar, so `getComputedStyle` must not run in a render loop).
+ */
 export function chartPalette(isDark: boolean): AppleChartPalette {
-  return isDark ? darkChartPalette : lightChartPalette;
+  const cached = paletteCache.get(isDark);
+  if (cached) return cached;
+
+  const palette = resolvePalette(isDark);
+  paletteCache.set(isDark, palette);
+  return palette;
 }
 
 /** Muted fill used for "no data" cells in both appearances. */
 export function unknownFill(isDark: boolean): string {
-  return isDark ? 'rgba(255, 255, 255, 0.24)' : 'rgba(16, 32, 58, 0.2)';
+  const cached = unknownFillCache.get(isDark);
+  if (cached) return cached;
+
+  const fromToken = readRootStyle()?.getPropertyValue(UNKNOWN_FILL_TOKEN).trim();
+  const fill = fromToken || (isDark ? 'rgba(255, 255, 255, 0.24)' : 'rgba(16, 32, 58, 0.2)');
+  unknownFillCache.set(isDark, fill);
+  return fill;
+}
+
+/** Invalidate the memoised tokens (styles.css hot reload, token refresh). */
+export function resetChartPaletteCache(): void {
+  paletteCache.clear();
+  unknownFillCache.clear();
 }

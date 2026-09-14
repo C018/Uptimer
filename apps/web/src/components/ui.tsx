@@ -46,23 +46,27 @@ interface BadgeProps {
   size?: 'sm' | 'md';
 }
 
+/**
+ * Tint comes from the `ui-surface-*` / `ui-text-*` token utilities instead of
+ * per-variant Tailwind palette pairs, so light and dark appearance (and any
+ * future palette change) are handled by the design tokens alone.
+ * The fill/border classes are the only ones setting `border-color`, which
+ * keeps the capsule deterministic.
+ */
 const badgeStyles = {
-  up: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-emerald-400/25',
-  down: 'bg-red-50 text-red-700 ring-red-600/20 dark:bg-red-500/15 dark:text-red-300 dark:ring-red-400/25',
-  maintenance:
-    'bg-blue-50 text-blue-700 ring-blue-600/20 dark:bg-blue-500/15 dark:text-blue-300 dark:ring-blue-400/25',
-  paused:
-    'bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-500/15 dark:text-amber-300 dark:ring-amber-400/25',
-  unknown:
-    'bg-slate-100 text-slate-600 ring-slate-500/20 dark:bg-slate-500/15 dark:text-slate-300 dark:ring-slate-400/25',
-  info: 'bg-slate-100 text-slate-600 ring-slate-500/15 dark:bg-slate-500/10 dark:text-slate-300 dark:ring-slate-400/20',
+  up: 'ui-surface-up ui-text-up',
+  down: 'ui-surface-down ui-text-down',
+  maintenance: 'ui-surface-accent ui-text-maintenance',
+  paused: 'ui-surface-warn ui-text-warn',
+  unknown: 'ui-surface-neutral text-[var(--color-text-secondary)]',
+  info: 'ui-surface-neutral text-[var(--color-text-secondary)]',
 };
 
 export function Badge({ variant, children, size = 'sm' }: BadgeProps) {
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1 rounded-full font-medium ring-1 ring-inset',
+        'inline-flex items-center gap-1 rounded-full border font-medium',
         'apple-numeric',
         badgeStyles[variant],
         size === 'sm' ? 'px-2.5 py-0.5 text-caption-1' : 'px-3 py-1 text-footnote',
@@ -81,6 +85,8 @@ interface StatusDotProps {
   status: 'up' | 'down' | 'maintenance' | 'paused' | 'unknown';
   pulse?: boolean;
   size?: 'sm' | 'md';
+  /** Accessible name; omit when a visible status label sits right next to the dot. */
+  label?: string;
 }
 
 const dotColors = {
@@ -91,13 +97,15 @@ const dotColors = {
   unknown: 'bg-[var(--color-unknown)]',
 };
 
-export function StatusDot({ status, pulse = false, size = 'md' }: StatusDotProps) {
+export function StatusDot({ status, pulse = false, size = 'md', label }: StatusDotProps) {
   const dotSize = size === 'sm' ? 'h-2 w-2' : 'h-2.5 w-2.5';
+  const accessibleName = label ? { role: 'img' as const, 'aria-label': label } : {};
 
   return (
-    <span className={cn('relative inline-flex', dotSize)}>
+    <span className={cn('relative inline-flex', dotSize)} {...accessibleName}>
       {pulse && (
         <span
+          aria-hidden="true"
           className={cn(
             'absolute inline-flex h-full w-full animate-ping rounded-full opacity-60',
             dotColors[status],
@@ -107,7 +115,7 @@ export function StatusDot({ status, pulse = false, size = 'md' }: StatusDotProps
       <span
         className={cn(
           'relative inline-flex h-full w-full rounded-full',
-          'shadow-[0_0_0_2px_rgba(255,255,255,0.65)] dark:shadow-none',
+          'shadow-[0_0_0_2px_var(--status-dot-halo)]',
           dotColors[status],
         )}
       />
@@ -171,7 +179,7 @@ export function ListGroup({
   return (
     <section className={className}>
       {title ? (
-        <h3 className="mb-2 px-1 text-footnote font-semibold uppercase tracking-wide text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
+        <h3 className="mb-2 px-1 text-footnote font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
           {title}
         </h3>
       ) : null}
@@ -283,26 +291,72 @@ export function Button({
   );
 }
 
-/** Segmented control (UISegmentedControl). */
+/**
+ * Segmented control (UISegmentedControl).
+ * Follows the ARIA tabs keyboard pattern: one tab stop for the group plus
+ * Left/Right/Up/Down/Home/End to move between segments.
+ */
 export function SegmentedControl<T extends string>({
   options,
   value,
   onChange,
   className = '',
+  label,
 }: {
   options: Array<{ value: T; label: ReactNode }>;
   value: T;
   onChange: (value: T) => void;
   className?: string;
+  /** Accessible name for the group (e.g. "Range", "Appearance"). */
+  label?: string;
 }) {
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    const currentIndex = options.findIndex((option) => option.value === value);
+    if (currentIndex < 0) return;
+
+    let nextIndex: number;
+    switch (event.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+        nextIndex = (currentIndex + 1) % options.length;
+        break;
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        nextIndex = (currentIndex - 1 + options.length) % options.length;
+        break;
+      case 'Home':
+        nextIndex = 0;
+        break;
+      case 'End':
+        nextIndex = options.length - 1;
+        break;
+      default:
+        return;
+    }
+
+    const next = options[nextIndex];
+    if (!next) return;
+
+    event.preventDefault();
+    onChange(next.value);
+    event.currentTarget.querySelectorAll('button')[nextIndex]?.focus();
+  };
+
   return (
-    <div role="tablist" className={cn('apple-segmented', className)}>
+    <div
+      role="tablist"
+      aria-label={label}
+      aria-orientation="horizontal"
+      className={cn('apple-segmented', className)}
+      onKeyDown={handleKeyDown}
+    >
       {options.map((option) => (
         <button
           key={option.value}
           type="button"
           role="tab"
           aria-selected={option.value === value}
+          tabIndex={option.value === value ? 0 : -1}
           onClick={() => onChange(option.value)}
           className="apple-segment"
         >
@@ -341,15 +395,24 @@ export function Switch({
   );
 }
 
-export function Spinner({ className = '' }: { className?: string }) {
+export function Spinner({
+  className = '',
+  label = 'Loading',
+}: {
+  className?: string;
+  /** Accessible name announced while the indicator is on screen. */
+  label?: string;
+}) {
   return (
     <span
       className={cn(
-        'inline-block h-5 w-5 animate-spin rounded-full border-2 ui-border-hairline border-t-blue-500 dark:border-[var(--color-border)] dark:border-t-blue-400',
+        'inline-block h-5 w-5 animate-spin rounded-full border-2',
+        'ui-border-hairline border-t-[var(--color-accent)]',
         className,
       )}
       role="status"
       aria-live="polite"
+      aria-label={label}
     />
   );
 }

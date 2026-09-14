@@ -421,6 +421,11 @@ const en = {
   'notification_form.payload_type_help':
     'Non-JSON types only support a flat key/value payload_template object.',
   'notification_form.timeout_ms': 'Timeout (ms)',
+  'notification_form.message_locale': 'Notification Language',
+  'notification_form.message_locale_zh': '简体中文 (zh-CN)',
+  'notification_form.message_locale_en': 'English',
+  'notification_form.message_locale_help':
+    'Language of the built-in notification title and body. Custom message templates are sent as-is.',
   'notification_form.headers_json': 'Headers (JSON)',
   'notification_form.headers_placeholder': '{"Authorization":"Bearer $TOKEN"}',
   'notification_form.headers_help': 'Header values support magic variables like {{message}}.',
@@ -941,6 +946,11 @@ const zhCn: LocaleMessages = {
   'notification_form.payload_type_help':
     '非 JSON 类型仅支持扁平 key/value 的 payload_template 对象。',
   'notification_form.timeout_ms': '超时（毫秒）',
+  'notification_form.message_locale': '通知语言',
+  'notification_form.message_locale_zh': '简体中文',
+  'notification_form.message_locale_en': 'English',
+  'notification_form.message_locale_help':
+    '内置通知标题与正文使用的语言；自定义消息模板将原样发送，不会被翻译。',
   'notification_form.headers_json': '请求头（JSON）',
   'notification_form.headers_placeholder': '{"Authorization":"Bearer $TOKEN"}',
   'notification_form.headers_help': '请求头值支持 {{message}} 这类变量。',
@@ -1432,6 +1442,11 @@ const zhTw: LocaleMessages = {
   'notification_form.payload_type_help':
     '非 JSON 類型僅支援扁平鍵值（key/value）的 payload_template 物件。',
   'notification_form.timeout_ms': '逾時（毫秒）',
+  'notification_form.message_locale': '通知語言',
+  'notification_form.message_locale_zh': '簡體中文',
+  'notification_form.message_locale_en': 'English',
+  'notification_form.message_locale_help':
+    '內建通知標題與內文使用的語言；自訂訊息模板將原樣送出，不會被翻譯。',
   'notification_form.headers_json': '請求標頭（JSON）',
   'notification_form.headers_placeholder': '{"Authorization":"Bearer $TOKEN"}',
   'notification_form.headers_help': '請求標頭值支援魔術變數，如 {{message}}。',

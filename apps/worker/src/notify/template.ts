@@ -1,4 +1,10 @@
-import type { NotificationEventType } from '@uptimer/db';
+import {
+  DEFAULT_NOTIFICATION_LOCALE,
+  type NotificationEventType,
+  type NotificationLocale,
+} from '@uptimer/db';
+
+import { localizeImpact, localizeProbeError } from './probe-error-i18n';
 
 const FORBIDDEN_KEYS = new Set(['__proto__', 'prototype', 'constructor']);
 
@@ -142,7 +148,24 @@ function asString(vars: Record<string, unknown>, path: string): string {
   }
 }
 
+/**
+ * Default notification body for a built-in event type.
+ *
+ * `locale` selects the wording (`zh-CN` by default, `en` keeps the legacy
+ * English wording). Probe error text embedded in the body is localized too.
+ */
 export function defaultMessageForEvent(
+  eventType: NotificationEventType | string,
+  vars: Record<string, unknown>,
+  locale: NotificationLocale = DEFAULT_NOTIFICATION_LOCALE,
+): string {
+  return locale === 'en'
+    ? englishMessageForEvent(eventType, vars)
+    : chineseMessageForEvent(eventType, vars);
+}
+
+/** Legacy English wording, kept byte-for-byte identical to the pre-i18n output. */
+function englishMessageForEvent(
   eventType: NotificationEventType | string,
   vars: Record<string, unknown>,
 ): string {
@@ -200,8 +223,82 @@ export function defaultMessageForEvent(
   }
 }
 
-/** Short push title for channels that need one (e.g. Bark). */
-export function defaultTitleForEvent(eventType: NotificationEventType | string): string {
+/** Chinese wording (default). */
+function chineseMessageForEvent(
+  eventType: NotificationEventType | string,
+  vars: Record<string, unknown>,
+): string {
+  switch (eventType) {
+    case 'monitor.down': {
+      const name = asString(vars, 'monitor.name');
+      const displayUrl = asString(vars, 'monitor.display_url');
+      const err = localizeProbeError(asString(vars, 'state.error'), 'zh-CN');
+      return `监控故障：${name}${displayUrl ? `（${displayUrl}）` : ''}${err ? `\n错误：${err}` : ''}`;
+    }
+    case 'monitor.up': {
+      const name = asString(vars, 'monitor.name');
+      const displayUrl = asString(vars, 'monitor.display_url');
+      return `监控恢复：${name}${displayUrl ? `（${displayUrl}）` : ''}`;
+    }
+    case 'monitor.ssl_expiring': {
+      const name = asString(vars, 'monitor.name');
+      const host = asString(vars, 'ssl.hostname') || asString(vars, 'monitor.display_url') || name;
+      const days = asString(vars, 'ssl.days_remaining');
+      const validTo = asString(vars, 'ssl.valid_to');
+      const expired = asString(vars, 'ssl.severity') === 'expired';
+      const headline = expired ? 'SSL 证书已过期' : 'SSL 证书即将到期';
+      const daysText = days ? `（剩余 ${days} 天）` : '';
+      return `${headline}：${host}${daysText}${validTo ? `\n到期时间：${validTo}` : ''}`;
+    }
+    case 'incident.created': {
+      const title = asString(vars, 'incident.title');
+      const impact = asString(vars, 'incident.impact');
+      const impactText = impact ? `（影响级别：${localizeImpact(impact, 'zh-CN')}）` : '';
+      return `新建故障事件：${title}${impactText}`;
+    }
+    case 'incident.updated': {
+      const title = asString(vars, 'incident.title');
+      const msg = asString(vars, 'update.message');
+      return `故障事件更新：${title}${msg ? `\n${msg}` : ''}`;
+    }
+    case 'incident.resolved': {
+      const title = asString(vars, 'incident.title');
+      return `故障事件已解决：${title}`;
+    }
+    case 'maintenance.started': {
+      const title = asString(vars, 'maintenance.title');
+      return `维护已开始：${title}`;
+    }
+    case 'maintenance.ended': {
+      const title = asString(vars, 'maintenance.title');
+      return `维护已结束：${title}`;
+    }
+    case 'test.ping': {
+      return 'Uptimer 测试通知';
+    }
+    default: {
+      const ev = asString(vars, 'event');
+      return ev ? `Uptimer 事件：${ev}` : 'Uptimer 通知';
+    }
+  }
+}
+
+/**
+ * Short push title for channels that need one (e.g. Bark).
+ *
+ * `locale` selects the wording (`zh-CN` by default, `en` keeps the legacy
+ * English wording).
+ */
+export function defaultTitleForEvent(
+  eventType: NotificationEventType | string,
+  locale: NotificationLocale = DEFAULT_NOTIFICATION_LOCALE,
+): string {
+  return locale === 'en'
+    ? englishTitleForEvent(eventType)
+    : chineseTitleForEvent(eventType);
+}
+
+function englishTitleForEvent(eventType: NotificationEventType | string): string {
   switch (eventType) {
     case 'monitor.down':
       return 'Monitor DOWN';
@@ -221,6 +318,31 @@ export function defaultTitleForEvent(eventType: NotificationEventType | string):
       return 'Maintenance ended';
     case 'test.ping':
       return 'Uptimer test';
+    default:
+      return 'Uptimer';
+  }
+}
+
+function chineseTitleForEvent(eventType: NotificationEventType | string): string {
+  switch (eventType) {
+    case 'monitor.down':
+      return '监控故障';
+    case 'monitor.up':
+      return '监控恢复';
+    case 'monitor.ssl_expiring':
+      return 'SSL 证书';
+    case 'incident.created':
+      return '新建故障事件';
+    case 'incident.updated':
+      return '故障事件更新';
+    case 'incident.resolved':
+      return '故障事件已解决';
+    case 'maintenance.started':
+      return '维护已开始';
+    case 'maintenance.ended':
+      return '维护已结束';
+    case 'test.ping':
+      return 'Uptimer 测试';
     default:
       return 'Uptimer';
   }

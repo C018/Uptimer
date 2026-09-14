@@ -84,7 +84,7 @@ function MonitorDetail({ monitorId, onClose }: { monitorId: number; onClose: () 
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+          <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">
             {data?.monitor.name ?? t('common.loading')}
           </h2>
           <button
@@ -103,32 +103,32 @@ function MonitorDetail({ monitorId, onClose }: { monitorId: number; onClose: () 
         </div>
 
         {isLoading ? (
-          <div className="h-[200px] flex items-center justify-center text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
+          <div className="h-[200px] flex items-center justify-center text-[var(--color-text-muted)]">
             {t('status_page.loading_chart')}
           </div>
         ) : data ? (
           <>
             <div className="grid grid-cols-2 gap-3 sm:gap-6 mb-6">
               <div className="bg-[var(--color-bg)] dark:bg-[var(--color-bg-secondary)] rounded-lg px-3 sm:px-4 py-2.5 sm:py-3">
-                <div className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] uppercase tracking-wide mb-1">
+                <div className="text-xs text-[var(--color-text-muted)] uppercase tracking-wide mb-1">
                   {t('status_page.avg_latency')}
                 </div>
-                <div className="text-base sm:text-lg font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+                <div className="text-base sm:text-lg font-semibold text-[var(--color-text-primary)]">
                   {data.avg_latency_ms ?? '-'}ms
                 </div>
               </div>
               <div className="bg-[var(--color-bg)] dark:bg-[var(--color-bg-secondary)] rounded-lg px-3 sm:px-4 py-2.5 sm:py-3">
-                <div className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] uppercase tracking-wide mb-1">
+                <div className="text-xs text-[var(--color-text-muted)] uppercase tracking-wide mb-1">
                   {t('status_page.p95_latency')}
                 </div>
-                <div className="text-base sm:text-lg font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+                <div className="text-base sm:text-lg font-semibold text-[var(--color-text-primary)]">
                   {data.p95_latency_ms ?? '-'}ms
                 </div>
               </div>
             </div>
             <Suspense
               fallback={
-                <div className="h-[200px] flex items-center justify-center text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
+                <div className="h-[200px] flex items-center justify-center text-[var(--color-text-muted)]">
                   {t('status_page.loading_chart')}
                 </div>
               }
@@ -137,7 +137,7 @@ function MonitorDetail({ monitorId, onClose }: { monitorId: number; onClose: () 
             </Suspense>
           </>
         ) : (
-          <div className="h-[200px] flex items-center justify-center text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
+          <div className="h-[200px] flex items-center justify-center text-[var(--color-text-muted)]">
             {t('status_page.failed_load_data')}
           </div>
         )}
@@ -163,7 +163,7 @@ function IncidentCard({
       className="ui-panel ui-panel-hover w-full rounded-xl p-3.5 sm:p-5 text-left"
     >
       <div className="flex items-start justify-between gap-4 mb-2">
-        <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">{incident.title}</h4>
+        <h4 className="font-semibold text-[var(--color-text-primary)]">{incident.title}</h4>
         <Badge
           variant={
             incident.impact === 'critical'
@@ -176,7 +176,7 @@ function IncidentCard({
           {incidentImpactLabel(incident.impact, t)}
         </Badge>
       </div>
-      <div className="flex items-center gap-3 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] mb-3">
+      <div className="flex items-center gap-3 text-sm text-[var(--color-text-muted)] mb-3">
         <Badge variant="info">{incidentStatusLabel(incident.status, t)}</Badge>
         <span>{formatDateTime(incident.started_at, timeZone, locale)}</span>
       </div>
@@ -214,7 +214,7 @@ function IncidentDetail({
       >
         <div className="flex justify-between items-start mb-4 sm:mb-6">
           <div>
-            <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] mb-2">
+            <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-text-primary)] mb-2">
               {incident.title}
             </h2>
             <div className="flex flex-wrap items-center gap-2">
@@ -245,7 +245,7 @@ function IncidentDetail({
 
         <div className="space-y-2 sm:space-y-3 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-primary)] mb-4 sm:mb-6 pb-4 sm:pb-6 border-b ui-border-hairline dark:border-[var(--color-border)]">
           <div className="flex flex-col sm:flex-row sm:gap-2">
-            <span className="text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] sm:w-20 text-xs sm:text-sm">
+            <span className="text-[var(--color-text-muted)] sm:w-20 text-xs sm:text-sm">
               {t('common.affected')}:
             </span>
             <span className="text-sm">
@@ -259,14 +259,14 @@ function IncidentDetail({
             </span>
           </div>
           <div className="flex flex-col sm:flex-row sm:gap-2">
-            <span className="text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] sm:w-20 text-xs sm:text-sm">
+            <span className="text-[var(--color-text-muted)] sm:w-20 text-xs sm:text-sm">
               {t('common.started')}:
             </span>
             <span className="text-sm">{formatDateTime(incident.started_at, timeZone, locale)}</span>
           </div>
           {incident.resolved_at && (
             <div className="flex flex-col sm:flex-row sm:gap-2">
-              <span className="text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] sm:w-20 text-xs sm:text-sm">
+              <span className="text-[var(--color-text-muted)] sm:w-20 text-xs sm:text-sm">
                 {t('common.resolved')}:
               </span>
               <span className="text-sm">
@@ -279,7 +279,7 @@ function IncidentDetail({
         <div className="space-y-4">
           {incident.message && (
             <div className="bg-[var(--color-bg)] dark:bg-[var(--color-bg-secondary)] rounded-lg p-4">
-              <div className="text-xs uppercase tracking-wide text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] mb-2">
+              <div className="text-xs uppercase tracking-wide text-[var(--color-text-muted)] mb-2">
                 {t('status_page.initial_report')}
               </div>
               <Markdown text={incident.message} />
@@ -290,7 +290,7 @@ function IncidentDetail({
             <div key={u.id} className="border-l-2 ui-border-hairline dark:border-[var(--color-border)] pl-4">
               <div className="flex items-center gap-3 mb-2">
                 {u.status && <Badge variant="info">{incidentStatusLabel(u.status, t)}</Badge>}
-                <span className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
+                <span className="text-xs text-[var(--color-text-muted)]">
                   {formatDateTime(u.created_at, timeZone, locale)}
                 </span>
               </div>
@@ -299,13 +299,13 @@ function IncidentDetail({
           ))}
 
           {incident.updates.length === 0 && isLoadingDetails && (
-            <div className="text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
+            <div className="text-sm text-[var(--color-text-muted)]">
               {t('common.loading')}
             </div>
           )}
 
           {incident.updates.length === 0 && hasDetailsError && (
-            <div className="text-sm ui-text-down dark:ui-text-down">
+            <div className="text-sm ui-text-down">
               {t('status_page.failed_load_data')}
             </div>
           )}
@@ -490,7 +490,7 @@ export function StatusPage() {
           <h2 className="text-xl font-semibold text-[var(--color-text-primary)] mb-2">
             {t('status_page.unable_to_load_status')}
           </h2>
-          <p className="text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">{t('status_page.check_connection')}</p>
+          <p className="text-[var(--color-text-muted)]">{t('status_page.check_connection')}</p>
         </div>
       </div>
     );
@@ -509,11 +509,11 @@ export function StatusPage() {
       <header className="sticky top-0 z-20 apple-nav">
         <div className="mx-auto max-w-5xl px-4 py-3 sm:px-6 sm:py-4 lg:px-8 flex justify-between items-center">
           <Link to="/" className="flex flex-col justify-center min-w-0 min-h-9">
-            <span className="text-xl sm:text-2xl font-bold leading-tight text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] truncate">
+            <span className="text-xl sm:text-2xl font-bold leading-tight text-[var(--color-text-primary)] truncate">
               {siteTitle}
             </span>
             {data.site_description ? (
-              <span className="mt-0.5 text-sm leading-tight text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] truncate">
+              <span className="mt-0.5 text-sm leading-tight text-[var(--color-text-muted)] truncate">
                 {data.site_description}
               </span>
             ) : null}
@@ -585,7 +585,7 @@ export function StatusPage() {
           <section className="mb-6 sm:mb-8">
             <h3 className="ui-group-header text-base sm:text-lg font-semibold text-[var(--color-text-primary)] mb-2.5 sm:mb-3 flex items-center gap-2">
               <svg
-                className="w-4 h-4 sm:w-5 sm:h-5 ui-text-accent dark:ui-text-accent"
+                className="w-4 h-4 sm:w-5 sm:h-5 ui-text-accent"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -608,7 +608,7 @@ export function StatusPage() {
 
             {data.maintenance_windows.active.length > 0 && (
               <div className="mb-4">
-                <div className="text-xs uppercase tracking-wide text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] mb-2">
+                <div className="text-xs uppercase tracking-wide text-[var(--color-text-muted)] mb-2">
                   {t('common.active')}
                 </div>
                 <div className="space-y-3">
@@ -618,10 +618,10 @@ export function StatusPage() {
                       className="border-l-4 border-l-[var(--color-accent)] p-4 sm:p-5"
                     >
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4 mb-2">
-                        <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+                        <h4 className="font-semibold text-[var(--color-text-primary)]">
                           {w.title}
                         </h4>
-                        <span className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] whitespace-nowrap">
+                        <span className="text-xs text-[var(--color-text-muted)] whitespace-nowrap">
                           {formatDateTime(w.starts_at, timeZone, locale)} –{' '}
                           {formatDateTime(w.ends_at, timeZone, locale)}
                         </span>
@@ -639,7 +639,7 @@ export function StatusPage() {
 
             {data.maintenance_windows.upcoming.length > 0 && (
               <div>
-                <div className="text-xs uppercase tracking-wide text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] mb-2">
+                <div className="text-xs uppercase tracking-wide text-[var(--color-text-muted)] mb-2">
                   {t('common.upcoming')}
                 </div>
                 <div className="space-y-3">
@@ -649,10 +649,10 @@ export function StatusPage() {
                       className="border-l-4 border-l-[var(--color-unknown)] p-4 sm:p-5"
                     >
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4 mb-2">
-                        <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+                        <h4 className="font-semibold text-[var(--color-text-primary)]">
                           {w.title}
                         </h4>
-                        <span className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] whitespace-nowrap">
+                        <span className="text-xs text-[var(--color-text-muted)] whitespace-nowrap">
                           {formatDateTime(w.starts_at, timeZone, locale)} –{' '}
                           {formatDateTime(w.ends_at, timeZone, locale)}
                         </span>
@@ -674,7 +674,7 @@ export function StatusPage() {
           <section className="mb-6 sm:mb-8">
             <h3 className="ui-group-header text-base sm:text-lg font-semibold text-[var(--color-text-primary)] mb-2.5 sm:mb-3 flex items-center gap-2">
               <svg
-                className="w-4 h-4 sm:w-5 sm:h-5 ui-text-warn dark:ui-text-warn"
+                className="w-4 h-4 sm:w-5 sm:h-5 ui-text-warn"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -742,7 +742,7 @@ export function StatusPage() {
           </div>
           {data.monitors.length === 0 && (
             <Card className="p-8 text-center">
-              <p className="text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">{t('status_page.no_monitors')}</p>
+              <p className="text-[var(--color-text-muted)]">{t('status_page.no_monitors')}</p>
             </Card>
           )}
         </section>
@@ -750,12 +750,12 @@ export function StatusPage() {
         <section className="mt-6 pt-5 sm:mt-8 sm:pt-6 border-t ui-border-hairline dark:border-[var(--color-border)] space-y-6 sm:space-y-8">
           <div>
             <div className="flex items-center justify-between mb-2.5 sm:mb-3">
-              <h3 className="text-base sm:text-lg font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+              <h3 className="text-base sm:text-lg font-semibold text-[var(--color-text-primary)]">
                 {t('status_page.incident_history')}
               </h3>
               <Link
                 to="/history/incidents"
-                className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-primary)]"
+                className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]"
               >
                 {t('common.view_more')}
               </Link>
@@ -774,7 +774,7 @@ export function StatusPage() {
               />
             ) : (
               <Card className="p-6 text-center">
-                <p className="text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
+                <p className="text-[var(--color-text-muted)]">
                   {t('status_page.no_past_incidents')}
                 </p>
               </Card>
@@ -783,12 +783,12 @@ export function StatusPage() {
 
           <div>
             <div className="flex items-center justify-between mb-2.5 sm:mb-3">
-              <h3 className="text-base sm:text-lg font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+              <h3 className="text-base sm:text-lg font-semibold text-[var(--color-text-primary)]">
                 {t('status_page.maintenance_history')}
               </h3>
               <Link
                 to="/history/maintenance"
-                className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-primary)]"
+                className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]"
               >
                 {t('common.view_more')}
               </Link>
@@ -797,10 +797,10 @@ export function StatusPage() {
             {maintenanceHistoryPreview ? (
               <Card className="p-4 sm:p-5">
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4 mb-2">
-                  <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+                  <h4 className="font-semibold text-[var(--color-text-primary)]">
                     {maintenanceHistoryPreview.title}
                   </h4>
-                  <span className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)] whitespace-nowrap">
+                  <span className="text-xs text-[var(--color-text-muted)] whitespace-nowrap">
                     {formatDateTime(maintenanceHistoryPreview.starts_at, timeZone, locale)} –{' '}
                     {formatDateTime(maintenanceHistoryPreview.ends_at, timeZone, locale)}
                   </span>
@@ -813,7 +813,7 @@ export function StatusPage() {
               </Card>
             ) : (
               <Card className="p-6 text-center">
-                <p className="text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
+                <p className="text-[var(--color-text-muted)]">
                   {t('status_page.no_past_maintenance')}
                 </p>
               </Card>

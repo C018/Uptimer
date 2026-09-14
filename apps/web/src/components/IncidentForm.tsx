@@ -55,7 +55,7 @@ export function IncidentForm({
       <div>
         <div className={labelClass}>{t('incident_form.affected_monitors')}</div>
         {monitors.length === 0 ? (
-          <div className="text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-muted)]">
+          <div className="text-sm text-[var(--color-text-muted)]">
             {t('incident_form.no_monitors_available')}
           </div>
         ) : (
@@ -63,7 +63,7 @@ export function IncidentForm({
             {monitors.map((m) => (
               <label
                 key={m.id}
-                className="flex items-center gap-2.5 text-sm cursor-pointer text-[var(--color-text-secondary)] dark:text-[var(--color-text-primary)] hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-primary)]"
+                className="flex items-center gap-2.5 text-sm cursor-pointer text-[var(--color-text-secondary)] dark:text-[var(--color-text-primary)] hover:text-[var(--color-text-primary)]"
               >
                 <input
                   type="checkbox"
@@ -75,7 +75,7 @@ export function IncidentForm({
                         : selectedMonitorIds.filter((id) => id !== m.id),
                     )
                   }
-                  className="rounded ui-border-hairline dark:border-[var(--color-border)] text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] bg-[var(--color-card)] dark:bg-[var(--color-bg-secondary)] focus:ring-[var(--color-border)]"
+                  className="rounded ui-border-hairline dark:border-[var(--color-border)] text-[var(--color-text-primary)] bg-[var(--color-card)] dark:bg-[var(--color-bg-secondary)] focus:ring-[var(--color-border)]"
                 />
                 <span>{m.name}</span>
               </label>
@@ -83,7 +83,7 @@ export function IncidentForm({
           </div>
         )}
         {monitors.length > 0 && selectedMonitorIds.length === 0 && (
-          <div className="mt-2 text-sm ui-text-down dark:ui-text-down">
+          <div className="mt-2 text-sm ui-text-down">
             {t('incident_form.select_at_least_one')}
           </div>
         )}

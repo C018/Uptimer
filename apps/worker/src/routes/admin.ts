@@ -1523,7 +1523,12 @@ adminRoutes.post('/notification-channels/:id/test', async (c) => {
     event_id: eventKey,
     timestamp: now,
     // Provide representative fields so templates can be validated via the test button.
-    monitor: { id: 0, name: 'Example monitor', type: 'http', target: 'https://example.com/health' },
+    monitor: {
+      id: 0,
+      name: config.message_locale === 'en' ? 'Example monitor' : '示例监控',
+      type: 'http',
+      target: 'https://example.com/health',
+    },
     state: { status: 'up', latency_ms: 123, http_status: 200, error: null, location: null },
   };
 

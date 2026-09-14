@@ -536,6 +536,13 @@ export type NotificationEventType =
   | 'maintenance.ended'
   | 'test.ping';
 
+/**
+ * Language used for the channel's default notification title/body (and for the
+ * probe error text embedded in it). Defaults to `zh-CN` on the server when the
+ * field is absent, so legacy channels push Chinese.
+ */
+export type NotificationMessageLocale = 'zh-CN' | 'en';
+
 export interface CustomWebhookChannelConfig {
   preset?: 'custom';
   url: string;
@@ -543,6 +550,7 @@ export interface CustomWebhookChannelConfig {
   headers?: Record<string, string>;
   timeout_ms?: number;
   payload_type?: 'json' | 'param' | 'x-www-form-urlencoded';
+  message_locale?: NotificationMessageLocale;
   message_template?: string;
   payload_template?: unknown;
   enabled_events?: NotificationEventType[];
@@ -561,6 +569,7 @@ export interface TelegramChannelConfig {
   chat_id: string;
   message_thread_id?: number;
   timeout_ms?: number;
+  message_locale?: NotificationMessageLocale;
   message_template?: string;
   enabled_events?: CustomWebhookChannelConfig['enabled_events'];
   parse_mode?: TelegramParseMode;
@@ -591,6 +600,7 @@ export interface BarkChannelConfig {
   copy?: string;
 
   timeout_ms?: number;
+  message_locale?: NotificationMessageLocale;
   message_template?: string;
   enabled_events?: NotificationEventType[];
 }
