@@ -39,7 +39,9 @@ import type {
   AdminSettings,
   Incident,
   MaintenanceWindow,
+  MonitorSslState,
   NotificationChannel,
+  SslCertificateDetail,
   StatusResponse,
 } from '../api/types';
 import { IncidentForm } from '../components/IncidentForm';
@@ -48,6 +50,10 @@ import { MaintenanceWindowForm } from '../components/MaintenanceWindowForm';
 import { MonitorForm } from '../components/MonitorForm';
 import { NotificationChannelForm } from '../components/NotificationChannelForm';
 import { ResolveIncidentForm } from '../components/ResolveIncidentForm';
+import {
+  SslCertificateDetails,
+  fromMonitorSslState,
+} from '../components/SslCertificateDetails';
 import {
   Badge,
   Button,
@@ -295,6 +301,11 @@ export function AdminDashboard() {
   const ungroupedLabel = t('status_page.group_ungrouped');
   const [tab, setTab] = useState<Tab>('monitors');
   const [modal, setModal] = useState<ModalState>({ type: 'none' });
+  // Read-only TLS certificate dialog, kept outside ModalState since it never submits.
+  const [sslDetail, setSslDetail] = useState<{
+    monitorName: string;
+    ssl: SslCertificateDetail;
+  } | null>(null);
   const [testingMonitorId, setTestingMonitorId] = useState<number | null>(null);
   const [testingChannelId, setTestingChannelId] = useState<number | null>(null);
   const [monitorTestFeedback, setMonitorTestFeedback] = useState<MonitorTestFeedback | null>(null);
@@ -1558,26 +1569,42 @@ export function AdminDashboard() {
                                           <Badge variant="unknown">{t('common.inactive')}</Badge>
                                         )}
                                         {m.ssl_check_enabled && m.ssl && (
-                                          <Badge
-                                            variant={
-                                              m.ssl.status === 'ok'
-                                                ? 'up'
-                                                : m.ssl.status === 'expiring'
-                                                  ? 'paused'
-                                                  : m.ssl.status === 'expired' ||
-                                                      m.ssl.status === 'error'
-                                                    ? 'down'
-                                                    : 'unknown'
+                                          <button
+                                            type="button"
+                                            className="inline-flex rounded-full transition-opacity duration-200 ease-apple hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
+                                            title={t('ssl_detail.view')}
+                                            aria-label={t('ssl_detail.view')}
+                                            onClick={() =>
+                                              setSslDetail({
+                                                monitorName: formatMonitorDisplayName(m),
+                                                ssl: fromMonitorSslState(
+                                                  m.ssl as MonitorSslState,
+                                                  m.ssl_warn_days ?? null,
+                                                ),
+                                              })
                                             }
                                           >
-                                            {m.ssl.status === 'expired'
-                                              ? t('admin_dashboard.ssl_expired_short')
-                                              : m.ssl.days_remaining != null
-                                                ? t('admin_dashboard.ssl_days_remaining_short', {
-                                                    days: m.ssl.days_remaining,
-                                                  })
-                                                : t('admin_dashboard.ssl_label')}
-                                          </Badge>
+                                            <Badge
+                                              variant={
+                                                m.ssl.status === 'ok'
+                                                  ? 'up'
+                                                  : m.ssl.status === 'expiring'
+                                                    ? 'paused'
+                                                    : m.ssl.status === 'expired' ||
+                                                        m.ssl.status === 'error'
+                                                      ? 'down'
+                                                      : 'unknown'
+                                              }
+                                            >
+                                              {m.ssl.status === 'expired'
+                                                ? t('admin_dashboard.ssl_expired_short')
+                                                : m.ssl.days_remaining != null
+                                                  ? t('admin_dashboard.ssl_days_remaining_short', {
+                                                      days: m.ssl.days_remaining,
+                                                    })
+                                                  : t('admin_dashboard.ssl_label')}
+                                            </Badge>
+                                          </button>
                                         )}
                                       </div>
                                     </td>
@@ -2605,6 +2632,15 @@ export function AdminDashboard() {
             )}
           </div>
         </div>
+      )}
+
+      {sslDetail && (
+        <SslCertificateDetails
+          monitorName={sslDetail.monitorName}
+          ssl={sslDetail.ssl}
+          timeZone={settings?.site_timezone}
+          onClose={() => setSslDetail(null)}
+        />
       )}
     </div>
   );

@@ -131,9 +131,38 @@ export interface PublicSslSummaryEntry {
   status: PublicSslStatus;
   days_remaining: number | null;
   warn_days: number;
+  valid_from: number | null;
   valid_to: number | null;
   issuer: string | null;
+  subject: string | null;
+  serial_number: string | null;
+  /** Hostname the certificate was probed from. */
+  hostname: string | null;
+  /** TCP port the certificate was probed from. */
+  port: number | null;
+  /** Last probe error, shown as the failure reason in the details dialog. */
+  last_error: string | null;
   checked_at: number | null;
+}
+
+/**
+ * Normalised certificate detail consumed by the shared SSL details dialog.
+ * Built from either the public summary entry (status page) or
+ * `AdminMonitor['ssl']` (admin dashboard).
+ */
+export interface SslCertificateDetail {
+  status: MonitorSslStatus;
+  hostname: string | null;
+  port: number | null;
+  days_remaining: number | null;
+  warn_days: number | null;
+  valid_from: number | null;
+  valid_to: number | null;
+  issuer: string | null;
+  subject: string | null;
+  serial_number: string | null;
+  checked_at: number | null;
+  last_error: string | null;
 }
 
 export interface PublicSslSummaryResponse {

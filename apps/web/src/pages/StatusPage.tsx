@@ -18,10 +18,15 @@ import type {
   Outage,
   PublicHomepageResponse,
   PublicSslSummaryEntry,
+  SslCertificateDetail,
 } from '../api/types';
 import { DayDowntimeModal } from '../components/DayDowntimeModal';
 import { Markdown } from '../components/Markdown';
 import { MonitorCard } from '../components/MonitorCard';
+import {
+  SslCertificateDetails,
+  toSslCertificateDetail,
+} from '../components/SslCertificateDetails';
 import { incidentImpactLabel, incidentStatusLabel } from '../i18n/labels';
 import { formatDateTime, getBrowserTimeZone } from '../utils/datetime';
 import { Badge, Card, MODAL_OVERLAY_CLASS, MODAL_PANEL_CLASS, ThemeToggle } from '../components/ui';
@@ -367,6 +372,10 @@ export function StatusPage() {
   const [selectedDay, setSelectedDay] = useState<{ monitorId: number; dayStartAt: number } | null>(
     null,
   );
+  const [selectedSsl, setSelectedSsl] = useState<{
+    monitorName: string;
+    detail: SslCertificateDetail;
+  } | null>(null);
 
   const homepageQuery = useQuery({
     queryKey: ['homepage'],
@@ -731,6 +740,14 @@ export function StatusPage() {
                       timeZone={timeZone}
                       ssl={sslByMonitorId.get(monitor.id) ?? null}
                       onSelect={() => setSelectedMonitorId(monitor.id)}
+                      onSslClick={() => {
+                        const entry = sslByMonitorId.get(monitor.id);
+                        if (!entry || entry.status === 'unknown') return;
+                        setSelectedSsl({
+                          monitorName: monitor.name,
+                          detail: toSslCertificateDetail(entry),
+                        });
+                      }}
                       onDayClick={(dayStartAt) =>
                         setSelectedDay({ monitorId: monitor.id, dayStartAt })
                       }
@@ -832,6 +849,15 @@ export function StatusPage() {
       {/* Modals */}
       {selectedMonitorId !== null && (
         <MonitorDetail monitorId={selectedMonitorId} onClose={() => setSelectedMonitorId(null)} />
+      )}
+
+      {selectedSsl && (
+        <SslCertificateDetails
+          monitorName={selectedSsl.monitorName}
+          ssl={selectedSsl.detail}
+          timeZone={timeZone}
+          onClose={() => setSelectedSsl(null)}
+        />
       )}
 
       {selectedIncident && (

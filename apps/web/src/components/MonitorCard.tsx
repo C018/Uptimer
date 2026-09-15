@@ -62,6 +62,8 @@ export interface MonitorCardProps {
   onDayClick: (dayStartAt: number) => void;
   /** Optional TLS certificate summary (days remaining) shown as a badge. */
   ssl?: PublicSslSummaryEntry | null;
+  /** Opens the certificate details dialog for this monitor. */
+  onSslClick?: () => void;
 }
 
 function hasHomepageStrips(monitor: MonitorLike): monitor is HomepageMonitorLike {
@@ -125,6 +127,7 @@ export function MonitorCard({
   onDayClick,
   timeZone,
   ssl,
+  onSslClick,
 }: MonitorCardProps) {
   const { locale, t } = useI18n();
   const uptime30d = monitor.uptime_30d;
@@ -221,14 +224,28 @@ export function MonitorCard({
           ) : (
             <span className="text-xs text-[var(--color-text-muted)]">-</span>
           )}
-          {sslPill && (
-            <span
-              className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium tabular-nums ${sslPill.className}`}
-              title={sslPill.title}
-            >
-              {sslPill.label}
-            </span>
-          )}
+          {sslPill &&
+            (onSslClick ? (
+              <button
+                type="button"
+                className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium tabular-nums transition-opacity duration-200 ease-apple hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] ${sslPill.className}`}
+                title={sslPill.title}
+                aria-label={t('ssl_detail.view')}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onSslClick();
+                }}
+              >
+                {sslPill.label}
+              </button>
+            ) : (
+              <span
+                className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium tabular-nums ${sslPill.className}`}
+                title={sslPill.title}
+              >
+                {sslPill.label}
+              </span>
+            ))}
           <Badge variant={monitor.status}>{statusLabel(monitor.status, t)}</Badge>
         </div>
       </div>

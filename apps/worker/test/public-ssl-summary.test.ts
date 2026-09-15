@@ -31,8 +31,13 @@ type SslRowInput = {
   warnDays?: number | null;
   status?: string | null;
   storedDaysRemaining?: number | null;
+  validFrom?: number | null;
   validTo?: number | null;
   issuer?: string | null;
+  subject?: string | null;
+  serialNumber?: string | null;
+  hostname?: string | null;
+  port?: number | null;
   lastError?: string | null;
   /** Pass null to simulate a monitor without any certificate snapshot. */
   checkedAt?: number | null;
@@ -41,21 +46,41 @@ type SslRowInput = {
 /**
  * Drizzle maps raw rows positionally, so the fake D1 handler must return the
  * values in the exact order of the select list: monitorId, warnDays, status,
- * storedDaysRemaining, validTo, issuer, lastError, checkedAt.
+ * storedDaysRemaining, validFrom, validTo, issuer, subject, serialNumber,
+ * hostname, port, lastError, checkedAt.
  */
 function makeRow(input: SslRowInput): unknown[] {
   const checkedAt = input.checkedAt === undefined ? NOW - 60 : input.checkedAt;
   if (checkedAt === null) {
-    return [input.monitorId, input.warnDays ?? 14, null, null, null, null, null, null];
+    return [
+      input.monitorId,
+      input.warnDays ?? 14,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+    ];
   }
 
   return [
     input.monitorId,
     input.warnDays ?? 14,
-    input.status ?? 'valid',
+    input.status ?? 'ok',
     input.storedDaysRemaining ?? null,
+    input.validFrom ?? null,
     input.validTo ?? null,
     input.issuer ?? null,
+    input.subject ?? null,
+    input.serialNumber ?? null,
+    input.hostname ?? null,
+    input.port ?? null,
     input.lastError ?? null,
     checkedAt,
   ];
@@ -127,6 +152,13 @@ describe('public ssl summary route', () => {
     ]);
     expect(body.monitors.map((row) => row.days_remaining)).toEqual([40, 10, -2, null, null]);
     expect(body.monitors[0]).toMatchObject({ issuer: 'CA-A', warn_days: 14 });
+    // A failed probe keeps the recorded facts but adds the failure reason.
+    expect(body.monitors[3]).toMatchObject({
+      monitor_id: 4,
+      status: 'error',
+      last_error: 'tls handshake failed',
+      valid_to: NOW + 90 * DAY,
+    });
   });
 
   it('falls back to the stored days remaining when notAfter is missing', async () => {
@@ -146,5 +178,57 @@ describe('public ssl summary route', () => {
 
     expect(res.status).toBe(200);
     expect(body.monitors).toEqual([]);
+  });
+
+  it('exposes the full certificate snapshot consumed by the details dialog', async () => {
+    const { body } = await requestSslSummary([
+      makeRow({
+        monitorId: 11,
+        validFrom: NOW - 30 * DAY,
+        validTo: NOW + 40 * DAY,
+        issuer: 'CA-D',
+        subject: 'CN=status.example.com',
+        serialNumber: '0A1B2C3D',
+        hostname: 'status.example.com',
+        port: 443,
+      }),
+    ]);
+
+    expect(body.monitors[0]).toMatchObject({
+      monitor_id: 11,
+      status: 'ok',
+      days_remaining: 40,
+      warn_days: 14,
+      valid_from: NOW - 30 * DAY,
+      valid_to: NOW + 40 * DAY,
+      issuer: 'CA-D',
+      subject: 'CN=status.example.com',
+      serial_number: '0A1B2C3D',
+      hostname: 'status.example.com',
+      port: 443,
+      last_error: null,
+      checked_at: NOW - 60,
+    });
+  });
+
+  it('keeps the probe host and port even when the last check failed', async () => {
+    const { body } = await requestSslSummary([
+      makeRow({
+        monitorId: 12,
+        lastError: 'certificate verify failed',
+        issuer: 'CA-E',
+        hostname: 'down.example.com',
+        port: 8443,
+      }),
+    ]);
+
+    expect(body.monitors[0]).toMatchObject({
+      status: 'error',
+      days_remaining: null,
+      issuer: 'CA-E',
+      hostname: 'down.example.com',
+      port: 8443,
+      last_error: 'certificate verify failed',
+    });
   });
 });

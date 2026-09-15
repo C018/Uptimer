@@ -9,8 +9,17 @@ export type PublicSslSummaryEntry = {
   status: PublicSslSummaryStatus;
   days_remaining: number | null;
   warn_days: number;
+  valid_from: number | null;
   valid_to: number | null;
   issuer: string | null;
+  subject: string | null;
+  serial_number: string | null;
+  /** Hostname the certificate was probed from (monitor_ssl_state.hostname). */
+  hostname: string | null;
+  /** TCP port the certificate was probed from (monitor_ssl_state.port). */
+  port: number | null;
+  /** Last probe error, surfaced as the failure reason in the certificate details dialog. */
+  last_error: string | null;
   checked_at: number | null;
 };
 
@@ -35,8 +44,13 @@ export async function computePublicSslSummary(
       warnDays: monitors.sslWarnDays,
       status: monitorSslState.status,
       storedDaysRemaining: monitorSslState.daysRemaining,
+      validFrom: monitorSslState.validFrom,
       validTo: monitorSslState.validTo,
       issuer: monitorSslState.issuer,
+      subject: monitorSslState.subject,
+      serialNumber: monitorSslState.serialNumber,
+      hostname: monitorSslState.hostname,
+      port: monitorSslState.port,
       lastError: monitorSslState.lastError,
       checkedAt: monitorSslState.checkedAt,
     })
@@ -56,14 +70,27 @@ export async function computePublicSslSummary(
       const warnDays = row.warnDays ?? 0;
       const checkedAt = row.checkedAt ?? null;
 
+      // Certificate facts always come verbatim from monitor_ssl_state so the
+      // details dialog never has to hide a field the probe actually recorded;
+      // only the derived status decides how the homepage card renders them.
+      const certificate = {
+        valid_from: row.validFrom ?? null,
+        valid_to: row.validTo ?? null,
+        issuer: row.issuer ?? null,
+        subject: row.subject ?? null,
+        serial_number: row.serialNumber ?? null,
+        hostname: row.hostname ?? null,
+        port: row.port ?? null,
+      };
+
       if (checkedAt === null) {
         return {
           monitor_id: row.monitorId,
           status: 'unknown' as const,
           days_remaining: null,
           warn_days: warnDays,
-          valid_to: null,
-          issuer: null,
+          ...certificate,
+          last_error: null,
           checked_at: null,
         };
       }
@@ -74,8 +101,8 @@ export async function computePublicSslSummary(
           status: 'error' as const,
           days_remaining: null,
           warn_days: warnDays,
-          valid_to: null,
-          issuer: row.issuer ?? null,
+          ...certificate,
+          last_error: row.lastError,
           checked_at: checkedAt,
         };
       }
@@ -93,8 +120,8 @@ export async function computePublicSslSummary(
           status: 'unknown' as const,
           days_remaining: null,
           warn_days: warnDays,
-          valid_to: row.validTo ?? null,
-          issuer: row.issuer ?? null,
+          ...certificate,
+          last_error: null,
           checked_at: checkedAt,
         };
       }
@@ -104,8 +131,8 @@ export async function computePublicSslSummary(
         status: resolveSslStatus(daysRemaining, warnDays),
         days_remaining: daysRemaining,
         warn_days: warnDays,
-        valid_to: row.validTo ?? null,
-        issuer: row.issuer ?? null,
+        ...certificate,
+        last_error: null,
         checked_at: checkedAt,
       };
     }),
