@@ -19,8 +19,46 @@ export const PANEL_BASE_CLASS = 'ui-panel';
 export const PANEL_INTERACTIVE_CLASS =
   'ui-panel-hover hover:ui-border-hairline dark:hover:border-[var(--color-border)]';
 
-export const TABLE_ACTION_BUTTON_CLASS =
-  'inline-flex items-center justify-center rounded-apple px-2.5 py-1.5 text-footnote font-medium transition-colors focus-visible:outline-none';
+const TABLE_ACTION_BUTTON_BASE_CLASS = cn(
+  'inline-flex items-center justify-center rounded-apple transition-colors',
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]',
+);
+
+/** Text variant of a table row action (kept for non-icon usages). */
+export const TABLE_ACTION_BUTTON_CLASS = cn(
+  TABLE_ACTION_BUTTON_BASE_CLASS,
+  'px-2.5 py-1.5 text-footnote font-medium',
+);
+
+/** Compact icon variant used by every admin table action column. */
+export const TABLE_ACTION_ICON_BUTTON_CLASS = cn(
+  TABLE_ACTION_BUTTON_BASE_CLASS,
+  'h-7 w-7 shrink-0 disabled:opacity-50',
+);
+
+/**
+ * Pinned action column (see components/table-actions.tsx).
+ *
+ * The action column sticks to the right edge of the scroll container so it
+ * stays reachable while the other columns scroll. A pinned cell cannot inherit
+ * the row's translucent glass background — the scrolled columns would show
+ * through it — so it paints an opaque composite of the same surface (see the
+ * `--table-pinned-*` tokens in styles.css) plus a hairline divider and a soft
+ * left shadow that reads as "the content continues underneath".
+ */
+export const TABLE_ACTION_HEAD_CLASS = cn(
+  'sticky right-0 z-20 border-l border-[var(--color-border)]',
+  'bg-[var(--table-pinned-head-bg)] shadow-[var(--table-pinned-shadow)]',
+  'px-2 sm:px-3 py-3 text-right text-xs font-medium uppercase tracking-wide',
+  'text-[var(--color-text-muted)]',
+);
+
+export const TABLE_ACTION_CELL_CLASS = cn(
+  'sticky right-0 z-10 border-l border-[var(--color-border)]',
+  'bg-[var(--table-pinned-bg)] shadow-[var(--table-pinned-shadow)]',
+  'px-2 sm:px-3 py-3 text-right whitespace-nowrap',
+  'transition-colors group-hover:bg-[var(--table-pinned-bg-hover)]',
+);
 
 export const MODAL_OVERLAY_CLASS = 'ui-modal-overlay animate-fade-in';
 

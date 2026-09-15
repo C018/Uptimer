@@ -44,23 +44,31 @@ import type {
   SslCertificateDetail,
   StatusResponse,
 } from '../api/types';
+import {
+  EditIcon,
+  PauseIcon,
+  ResolveIcon,
+  ResumeIcon,
+  TestIcon,
+  TrashIcon,
+  UpdateIcon,
+} from '../components/action-icons';
 import { IncidentForm } from '../components/IncidentForm';
 import { IncidentUpdateForm } from '../components/IncidentUpdateForm';
 import { MaintenanceWindowForm } from '../components/MaintenanceWindowForm';
 import { MonitorForm } from '../components/MonitorForm';
 import { NotificationChannelForm } from '../components/NotificationChannelForm';
 import { ResolveIncidentForm } from '../components/ResolveIncidentForm';
-import {
-  SslCertificateDetails,
-  fromMonitorSslState,
-} from '../components/SslCertificateDetails';
+import { SslCertificateDetails, fromMonitorSslState } from '../components/SslCertificateDetails';
+import { TableActions } from '../components/table-actions';
 import {
   Badge,
   Button,
   Card,
   MODAL_OVERLAY_CLASS,
   MODAL_PANEL_CLASS,
-  TABLE_ACTION_BUTTON_CLASS,
+  TABLE_ACTION_CELL_CLASS,
+  TABLE_ACTION_HEAD_CLASS,
   ThemeToggle,
   cn,
 } from '../components/ui';
@@ -1101,9 +1109,7 @@ export function AdminDashboard() {
                 </div>
                 <div
                   className={`mt-2 text-sm ${
-                    monitorTestFeedback.result.error
-                      ? 'ui-text-down'
-                      : 'ui-text-up'
+                    monitorTestFeedback.result.error ? 'ui-text-down' : 'ui-text-up'
                   }`}
                 >
                   {monitorTestFeedback.result.error ?? t('admin_dashboard.monitor_test_no_error')}
@@ -1121,9 +1127,7 @@ export function AdminDashboard() {
                 <div className="mt-1 text-xs ui-text-down">
                   {formatDateTime(monitorTestError.at, settings?.site_timezone)}
                 </div>
-                <div className="mt-1 text-sm ui-text-down">
-                  {monitorTestError.message}
-                </div>
+                <div className="mt-1 text-sm ui-text-down">{monitorTestError.message}</div>
               </Card>
             )}
 
@@ -1295,16 +1299,12 @@ export function AdminDashboard() {
 
                   {monitorGroupReorderError && (
                     <Card className="p-3 ui-border-down ui-surface-down">
-                      <div className="text-sm ui-text-down">
-                        {monitorGroupReorderError}
-                      </div>
+                      <div className="text-sm ui-text-down">{monitorGroupReorderError}</div>
                     </Card>
                   )}
                   {monitorGroupManageError && (
                     <Card className="p-3 ui-border-down ui-surface-down">
-                      <div className="text-sm ui-text-down">
-                        {monitorGroupManageError}
-                      </div>
+                      <div className="text-sm ui-text-down">{monitorGroupManageError}</div>
                     </Card>
                   )}
 
@@ -1459,9 +1459,7 @@ export function AdminDashboard() {
                               <th className="hidden px-3 sm:px-4 py-3 text-left text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wide xl:table-cell">
                                 {t('admin_dashboard.monitor_table_last_error')}
                               </th>
-                              <th className="px-3 sm:px-4 py-3 text-right text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wide">
-                                {t('common.actions')}
-                              </th>
+                              <th className={TABLE_ACTION_HEAD_CLASS}>{t('common.actions')}</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-[var(--color-border-light)] dark:divide-[var(--color-border)]">
@@ -1491,7 +1489,7 @@ export function AdminDashboard() {
                                       </td>
                                     </tr>
                                   )}
-                                  <tr className="hover:bg-[var(--color-bg)] dark:hover:bg-[var(--color-bg-secondary)] transition-colors">
+                                  <tr className="group hover:bg-[var(--color-bg)] dark:hover:bg-[var(--color-bg-secondary)] transition-colors">
                                     <td className="px-3 sm:px-4 py-3">
                                       <input
                                         type="checkbox"
@@ -1631,73 +1629,74 @@ export function AdminDashboard() {
                                         {m.last_error ? m.last_error : '-'}
                                       </span>
                                     </td>
-                                    <td className="px-3 sm:px-4 py-3 text-right whitespace-nowrap">
-                                      <div className="flex items-center justify-end gap-1 sm:gap-0">
-                                        <button
-                                          onClick={() => {
-                                            setTestingMonitorId(m.id);
-                                            setMonitorTestFeedback(null);
-                                            setMonitorTestError(null);
-                                            testMonitorMut.mutate(m.id);
-                                          }}
-                                          disabled={testMonitorMut.isPending}
-                                          className={cn(
-                                            TABLE_ACTION_BUTTON_CLASS,
-                                            'ui-text-accent hover:ui-surface-accent hover:ui-text-accent disabled:opacity-50',
-                                          )}
-                                        >
-                                          {testingMonitorId === m.id
-                                            ? t('common.testing')
-                                            : t('common.test')}
-                                        </button>
-                                        <button
-                                          onClick={() => {
-                                            if (m.status === 'paused') {
-                                              resumeMonitorMut.mutate(m.id);
-                                            } else {
-                                              pauseMonitorMut.mutate(m.id);
-                                            }
-                                          }}
-                                          disabled={
-                                            pauseMonitorMut.isPending ||
-                                            resumeMonitorMut.isPending ||
-                                            testingMonitorId === m.id
-                                          }
-                                          className={cn(
-                                            TABLE_ACTION_BUTTON_CLASS,
-                                            'ui-text-warn hover:ui-surface-warn hover:ui-text-warn disabled:opacity-50',
-                                          )}
-                                        >
-                                          {m.status === 'paused'
-                                            ? t('common.resume')
-                                            : t('common.pause')}
-                                        </button>
-                                        <button
-                                          onClick={() => {
-                                            createMonitorMut.reset();
-                                            updateMonitorMut.reset();
-                                            setModal({ type: 'edit-monitor', monitor: m });
-                                          }}
-                                          className={cn(
-                                            TABLE_ACTION_BUTTON_CLASS,
-                                            'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg)] hover:text-[var(--color-text-primary)] dark:text-[var(--color-text-muted)] dark:hover:bg-[var(--color-bg-secondary)]',
-                                          )}
-                                        >
-                                          {t('common.edit')}
-                                        </button>
-                                        <button
-                                          onClick={() =>
-                                            confirm(`${t('common.delete')}?`) &&
-                                            deleteMonitorMut.mutate(m.id)
-                                          }
-                                          className={cn(
-                                            TABLE_ACTION_BUTTON_CLASS,
-                                            'ui-text-down hover:ui-surface-down hover:ui-text-down',
-                                          )}
-                                        >
-                                          {t('common.delete')}
-                                        </button>
-                                      </div>
+                                    <td className={TABLE_ACTION_CELL_CLASS}>
+                                      <TableActions
+                                        overflowLabel={t('common.more_actions')}
+                                        collapseBelow="md"
+                                        items={[
+                                          {
+                                            key: 'test',
+                                            label: t('common.test'),
+                                            icon: <TestIcon />,
+                                            tone: 'accent',
+                                            busy: testingMonitorId === m.id,
+                                            disabled: testMonitorMut.isPending,
+                                            onSelect: () => {
+                                              setTestingMonitorId(m.id);
+                                              setMonitorTestFeedback(null);
+                                              setMonitorTestError(null);
+                                              testMonitorMut.mutate(m.id);
+                                            },
+                                          },
+                                          {
+                                            key: 'pause',
+                                            label:
+                                              m.status === 'paused'
+                                                ? t('common.resume')
+                                                : t('common.pause'),
+                                            icon:
+                                              m.status === 'paused' ? (
+                                                <ResumeIcon />
+                                              ) : (
+                                                <PauseIcon />
+                                              ),
+                                            tone: 'warn',
+                                            disabled:
+                                              pauseMonitorMut.isPending ||
+                                              resumeMonitorMut.isPending ||
+                                              testingMonitorId === m.id,
+                                            onSelect: () => {
+                                              if (m.status === 'paused') {
+                                                resumeMonitorMut.mutate(m.id);
+                                              } else {
+                                                pauseMonitorMut.mutate(m.id);
+                                              }
+                                            },
+                                          },
+                                          {
+                                            key: 'edit',
+                                            label: t('common.edit'),
+                                            icon: <EditIcon />,
+                                            primary: true,
+                                            onSelect: () => {
+                                              createMonitorMut.reset();
+                                              updateMonitorMut.reset();
+                                              setModal({ type: 'edit-monitor', monitor: m });
+                                            },
+                                          },
+                                          {
+                                            key: 'delete',
+                                            label: t('common.delete'),
+                                            icon: <TrashIcon />,
+                                            tone: 'down',
+                                            onSelect: () => {
+                                              if (confirm(`${t('common.delete')}?`)) {
+                                                deleteMonitorMut.mutate(m.id);
+                                              }
+                                            },
+                                          },
+                                        ]}
+                                      />
                                     </td>
                                   </tr>
                                 </Fragment>
@@ -1803,9 +1802,7 @@ export function AdminDashboard() {
                 <div className="mt-1 text-xs ui-text-down">
                   {formatDateTime(channelTestError.at, settings?.site_timezone)}
                 </div>
-                <div className="mt-1 text-sm ui-text-down">
-                  {channelTestError.message}
-                </div>
+                <div className="mt-1 text-sm ui-text-down">{channelTestError.message}</div>
               </Card>
             )}
 
@@ -1830,16 +1827,14 @@ export function AdminDashboard() {
                         <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wide">
                           {t('common.target')}
                         </th>
-                        <th className="px-3 sm:px-4 py-3 text-right text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wide">
-                          {t('common.actions')}
-                        </th>
+                        <th className={TABLE_ACTION_HEAD_CLASS}>{t('common.actions')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[var(--color-border-light)] dark:divide-[var(--color-border)]">
                       {channelsQuery.data.notification_channels.map((ch) => (
                         <tr
                           key={ch.id}
-                          className="hover:bg-[var(--color-bg)] dark:hover:bg-[var(--color-bg-secondary)] transition-colors"
+                          className="group hover:bg-[var(--color-bg)] dark:hover:bg-[var(--color-bg-secondary)] transition-colors"
                         >
                           <td className="px-3 sm:px-4 py-3 text-sm font-medium text-[var(--color-text-primary)]">
                             {ch.name}
@@ -1856,47 +1851,44 @@ export function AdminDashboard() {
                               ? `${t('notification_form.preset_telegram')}: ${ch.config_json.chat_id}`
                               : ch.config_json.url}
                           </td>
-                          <td className="px-3 sm:px-4 py-3 text-right whitespace-nowrap">
-                            <div className="flex items-center justify-end gap-1 sm:gap-0">
-                              <button
-                                onClick={() => {
-                                  setTestingChannelId(ch.id);
-                                  setChannelTestFeedback(null);
-                                  setChannelTestError(null);
-                                  testChannelMut.mutate(ch.id);
-                                }}
-                                disabled={testChannelMut.isPending}
-                                className={cn(
-                                  TABLE_ACTION_BUTTON_CLASS,
-                                  'ui-text-accent hover:ui-surface-accent hover:ui-text-accent disabled:opacity-50',
-                                )}
-                              >
-                                {testingChannelId === ch.id
-                                  ? t('common.testing')
-                                  : t('common.test')}
-                              </button>
-                              <button
-                                onClick={() => setModal({ type: 'edit-channel', channel: ch })}
-                                className={cn(
-                                  TABLE_ACTION_BUTTON_CLASS,
-                                  'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg)] hover:text-[var(--color-text-primary)] dark:text-[var(--color-text-muted)] dark:hover:bg-[var(--color-bg-secondary)]',
-                                )}
-                              >
-                                {t('common.edit')}
-                              </button>
-                              <button
-                                onClick={() =>
-                                  confirm(`${t('common.delete')} "${ch.name}"?`) &&
-                                  deleteChannelMut.mutate(ch.id)
-                                }
-                                className={cn(
-                                  TABLE_ACTION_BUTTON_CLASS,
-                                  'ui-text-down hover:ui-surface-down hover:ui-text-down',
-                                )}
-                              >
-                                {t('common.delete')}
-                              </button>
-                            </div>
+                          <td className={TABLE_ACTION_CELL_CLASS}>
+                            <TableActions
+                              overflowLabel={t('common.more_actions')}
+                              items={[
+                                {
+                                  key: 'test',
+                                  label: t('common.test'),
+                                  icon: <TestIcon />,
+                                  tone: 'accent',
+                                  busy: testingChannelId === ch.id,
+                                  disabled: testChannelMut.isPending,
+                                  onSelect: () => {
+                                    setTestingChannelId(ch.id);
+                                    setChannelTestFeedback(null);
+                                    setChannelTestError(null);
+                                    testChannelMut.mutate(ch.id);
+                                  },
+                                },
+                                {
+                                  key: 'edit',
+                                  label: t('common.edit'),
+                                  icon: <EditIcon />,
+                                  primary: true,
+                                  onSelect: () => setModal({ type: 'edit-channel', channel: ch }),
+                                },
+                                {
+                                  key: 'delete',
+                                  label: t('common.delete'),
+                                  icon: <TrashIcon />,
+                                  tone: 'down',
+                                  onSelect: () => {
+                                    if (confirm(`${t('common.delete')} "${ch.name}"?`)) {
+                                      deleteChannelMut.mutate(ch.id);
+                                    }
+                                  },
+                                },
+                              ]}
+                            />
                           </td>
                         </tr>
                       ))}
@@ -2325,16 +2317,14 @@ export function AdminDashboard() {
                         <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wide">
                           {t('common.impact')}
                         </th>
-                        <th className="px-3 sm:px-4 py-3 text-right text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wide">
-                          {t('common.actions')}
-                        </th>
+                        <th className={TABLE_ACTION_HEAD_CLASS}>{t('common.actions')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[var(--color-border-light)] dark:divide-[var(--color-border)]">
                       {incidentsQuery.data.incidents.map((it) => (
                         <tr
                           key={it.id}
-                          className="hover:bg-[var(--color-bg)] dark:hover:bg-[var(--color-bg-secondary)] transition-colors"
+                          className="group hover:bg-[var(--color-bg)] dark:hover:bg-[var(--color-bg-secondary)] transition-colors"
                         >
                           <td className="px-3 sm:px-4 py-3 text-sm font-medium text-[var(--color-text-primary)]">
                             {it.title}
@@ -2364,43 +2354,41 @@ export function AdminDashboard() {
                               {incidentImpactLabel(it.impact, t)}
                             </Badge>
                           </td>
-                          <td className="px-3 sm:px-4 py-3 text-right whitespace-nowrap">
-                            <div className="flex items-center justify-end gap-1 sm:gap-0">
-                              <button
-                                onClick={() =>
-                                  setModal({ type: 'add-incident-update', incident: it })
-                                }
-                                disabled={it.status === 'resolved'}
-                                className={cn(
-                                  TABLE_ACTION_BUTTON_CLASS,
-                                  'ui-text-accent hover:ui-surface-accent hover:ui-text-accent disabled:opacity-50',
-                                )}
-                              >
-                                {t('common.update')}
-                              </button>
-                              <button
-                                onClick={() => setModal({ type: 'resolve-incident', incident: it })}
-                                disabled={it.status === 'resolved'}
-                                className={cn(
-                                  TABLE_ACTION_BUTTON_CLASS,
-                                  'ui-text-up hover:ui-surface-up hover:ui-text-up disabled:opacity-50',
-                                )}
-                              >
-                                {t('resolve_incident.resolve')}
-                              </button>
-                              <button
-                                onClick={() =>
-                                  confirm(`${t('common.delete')} "${it.title}"?`) &&
-                                  deleteIncidentMut.mutate(it.id)
-                                }
-                                className={cn(
-                                  TABLE_ACTION_BUTTON_CLASS,
-                                  'ui-text-down hover:ui-surface-down hover:ui-text-down',
-                                )}
-                              >
-                                {t('common.delete')}
-                              </button>
-                            </div>
+                          <td className={TABLE_ACTION_CELL_CLASS}>
+                            <TableActions
+                              overflowLabel={t('common.more_actions')}
+                              items={[
+                                {
+                                  key: 'update',
+                                  label: t('common.update'),
+                                  icon: <UpdateIcon />,
+                                  primary: true,
+                                  disabled: it.status === 'resolved',
+                                  onSelect: () =>
+                                    setModal({ type: 'add-incident-update', incident: it }),
+                                },
+                                {
+                                  key: 'resolve',
+                                  label: t('resolve_incident.resolve'),
+                                  icon: <ResolveIcon />,
+                                  tone: 'up',
+                                  disabled: it.status === 'resolved',
+                                  onSelect: () =>
+                                    setModal({ type: 'resolve-incident', incident: it }),
+                                },
+                                {
+                                  key: 'delete',
+                                  label: t('common.delete'),
+                                  icon: <TrashIcon />,
+                                  tone: 'down',
+                                  onSelect: () => {
+                                    if (confirm(`${t('common.delete')} "${it.title}"?`)) {
+                                      deleteIncidentMut.mutate(it.id);
+                                    }
+                                  },
+                                },
+                              ]}
+                            />
                           </td>
                         </tr>
                       ))}
@@ -2446,9 +2434,7 @@ export function AdminDashboard() {
                         <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wide">
                           {t('common.state')}
                         </th>
-                        <th className="px-3 sm:px-4 py-3 text-right text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wide">
-                          {t('common.actions')}
-                        </th>
+                        <th className={TABLE_ACTION_HEAD_CLASS}>{t('common.actions')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[var(--color-border-light)] dark:divide-[var(--color-border)]">
@@ -2463,7 +2449,7 @@ export function AdminDashboard() {
                         return (
                           <tr
                             key={w.id}
-                            className="hover:bg-[var(--color-bg)] dark:hover:bg-[var(--color-bg-secondary)] transition-colors"
+                            className="group hover:bg-[var(--color-bg)] dark:hover:bg-[var(--color-bg-secondary)] transition-colors"
                           >
                             <td className="px-3 sm:px-4 py-3 text-sm font-medium text-[var(--color-text-primary)]">
                               {w.title}
@@ -2490,30 +2476,31 @@ export function AdminDashboard() {
                                 {state}
                               </Badge>
                             </td>
-                            <td className="px-3 sm:px-4 py-3 text-right whitespace-nowrap">
-                              <div className="flex items-center justify-end gap-1 sm:gap-0">
-                                <button
-                                  onClick={() => setModal({ type: 'edit-maintenance', window: w })}
-                                  className={cn(
-                                    TABLE_ACTION_BUTTON_CLASS,
-                                    'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg)] hover:text-[var(--color-text-primary)] dark:text-[var(--color-text-muted)] dark:hover:bg-[var(--color-bg-secondary)]',
-                                  )}
-                                >
-                                  {t('common.edit')}
-                                </button>
-                                <button
-                                  onClick={() =>
-                                    confirm(`${t('common.delete')} "${w.title}"?`) &&
-                                    deleteMaintenanceMut.mutate(w.id)
-                                  }
-                                  className={cn(
-                                    TABLE_ACTION_BUTTON_CLASS,
-                                    'ui-text-down hover:ui-surface-down hover:ui-text-down',
-                                  )}
-                                >
-                                  {t('common.delete')}
-                                </button>
-                              </div>
+                            <td className={TABLE_ACTION_CELL_CLASS}>
+                              <TableActions
+                                overflowLabel={t('common.more_actions')}
+                                items={[
+                                  {
+                                    key: 'edit',
+                                    label: t('common.edit'),
+                                    icon: <EditIcon />,
+                                    primary: true,
+                                    onSelect: () =>
+                                      setModal({ type: 'edit-maintenance', window: w }),
+                                  },
+                                  {
+                                    key: 'delete',
+                                    label: t('common.delete'),
+                                    icon: <TrashIcon />,
+                                    tone: 'down',
+                                    onSelect: () => {
+                                      if (confirm(`${t('common.delete')} "${w.title}"?`)) {
+                                        deleteMaintenanceMut.mutate(w.id);
+                                      }
+                                    },
+                                  },
+                                ]}
+                              />
                             </td>
                           </tr>
                         );

@@ -102,6 +102,16 @@
 
   /* Halo painted behind status dots so they stay legible on glass. */
   --status-dot-halo: rgba(255, 255, 255, 0.65);
+
+  /* Pinned table action column — see TABLE_ACTION_CELL_CLASS in ui.tsx.
+   * A sticky cell cannot keep the row's translucent surface: the columns
+   * scrolling underneath would show through it. These are *opaque* composites
+   * of the same glass over the canvas, plus the inset shadow that hints at the
+   * content continuing under the pinned edge. */
+  --table-pinned-bg: #fbfcfe;
+  --table-pinned-bg-hover: #fdfdfe;
+  --table-pinned-head-bg: #fdfdfe;
+  --table-pinned-shadow: -12px 0 16px -14px rgba(17, 38, 71, 0.5);
 }
 
 .dark {
@@ -165,6 +175,12 @@
   --chart-unknown-fill: rgba(255, 255, 255, 0.24);
 
   --status-dot-halo: transparent;
+
+  /* Pinned table action column — dark appearance (see `:root`). */
+  --table-pinned-bg: #1c2636;
+  --table-pinned-bg-hover: #3c4452;
+  --table-pinned-head-bg: #3c4452;
+  --table-pinned-shadow: -12px 0 16px -14px rgba(0, 0, 0, 0.85);
 }
 
 /* ------------------------------------------------------------------ *
